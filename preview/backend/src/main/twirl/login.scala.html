@@ -1,0 +1,38 @@
+<nav class="ui fluid vertical menu" data-view="login">
+
+  <div id="message" class="ui item" data-bind="message">
+    </div>
+
+  <div class="ui icon input item" data-hideif="isSigned">
+    <input id="login" type="text" placeholder="login" data-bind="login">
+    <i data-class-icon-if="validUsername" class="checkmark green sign"></i>
+  </div>
+
+
+  <div class="ui icon input item" data-showif="inRegistration" data-hideif="isSigned" data-class-error-unless="emailValid">
+    <input id="email" type="text" data-bind="email" placeholder="email"><i data-class-icon-if="emailValid" class="checkmark green sign"></i>
+  </div>
+
+
+  <div class="ui input icon item" data-hideif="isSigned">
+    <input type="password" data-bind="password" placeholder="password"><i data-class-icon-if="validPassword" class="checkmark green sign"></i>
+  </div>
+
+  <div class="ui input icon item" data-class-error-unless="samePassword" data-showif="inRegistration" data-hideif="isSigned">
+    <input type="password" data-bind="repeat" placeholder="repeat password"><i data-class-icon-if="samePassword" class="checkmark green sign"></i>
+  </div>
+
+  <div class="ui item toggle buttons" data-hideif="isSigned">
+    <div id="loginBtn" class="ui small button"   data-class="loginClass" data-event-click="loginClick">Login</div>
+    <div class="or"></div>
+    <div id="registerBtn" class="ui small button" data-class="signupClass" data-event-click="signupClick">Sign up</div>
+  </div>
+
+  <div class="ui item"  data-showif="isSigned">
+        Logged in as <span data-bind="registeredName"></span>
+    </div>
+  <div class="ui item"  data-showif="isSigned">
+    <div class="ui green button" data-event-click="logoutClick">Log out</div>
+  </div>
+
+</nav>

@@ -1,0 +1,4 @@
+@(content:Option[Html] = None)
+<main id="main" class="ui green inverted segment">
+  @{content.getOrElse(<h1 id="hello" data-bind="hello" class="desc">This page is substitued</h1>)}
+</main>
