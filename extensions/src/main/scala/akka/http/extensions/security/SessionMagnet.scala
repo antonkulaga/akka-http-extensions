@@ -1,6 +1,6 @@
 package akka.http.extensions.security
 
-import akka.http.scaladsl.server.Directive
+import akka.http.scaladsl.server.{Directive1, Directive}
 import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 
@@ -11,15 +11,10 @@ object SessionMagnet {
   type FutureToken = String=>Future[String]
   type TryToken = String=>Try[String]
 
-  implicit private[this] def directive2magnet(dir:Directive[Tuple1[String]]): SessionMagnet =
-    new SessionMagnet {
-      val directive = dir
-    }
-  
+  implicit def futureUserToken(params:(LoginInfo,FutureToken)): SessionMagnet  = this.futureToken(params._1.username->params._2)
 
-
-  implicit def convertFuture(params:(String,FutureToken)): SessionMagnet  =
-      Directive[Tuple1[String]] { inner ⇒ ctx ⇒
+  implicit def futureToken(params:(String,FutureToken)): SessionMagnet  =
+    SessionMagnet(Directive[Tuple1[String]] { inner ⇒ ctx ⇒
         import ctx.executionContext
         val (username,tokenFun) = params
         val future: Future[String] = tokenFun(username)
@@ -28,24 +23,20 @@ object SessionMagnet {
           .recoverWith{case th=>
           ctx.reject(ReadErrorRejection(s"cannot generate session token for $username",th))
         }
-      }
+      })
 
 
+  implicit def tryUserToken(params:(LoginInfo,TryToken)): SessionMagnet  = this.tryToken(params._1.username->params._2)
 
-  implicit def convertTry(params:(String,TryToken)): SessionMagnet  =
-    new SessionMagnet {
-      val directive: Directive[Tuple1[String]] = Directive[Tuple1[String]] { inner ⇒ ctx ⇒
+  implicit def tryToken(params:(String,TryToken)): SessionMagnet  =
+    SessionMagnet(Directive[Tuple1[String]] { inner ⇒ ctx ⇒
         val (username,tokenFun) = params
         tokenFun(username) match {
           case Success(t)=>  inner(Tuple1(t))(ctx)
           case Failure(th)=>  ctx.reject(ReadErrorRejection(s"cannot generate session token for $username",th))
         }
-      }
-    }
-
+      })
 
 }
 
-trait SessionMagnet {
-  def directive: Directive[Tuple1[String]]
-}
+case class SessionMagnet(directive: Directive1[String])

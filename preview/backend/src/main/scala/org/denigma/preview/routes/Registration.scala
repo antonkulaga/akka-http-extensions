@@ -7,7 +7,8 @@ import akka.http.scaladsl.server._
 import scala.concurrent.Future
 
 class Registration(
-                    login:(String,String)=>Future[LoginResult],
+                    usernameLogin:(String,String)=>Future[LoginResult],
+                    emailLogin:(String,String)=>Future[LoginResult],
                     register:(String,String,String)=>Future[RegistrationResult],
                     getToken:String=>Future[String]
                     ) extends AuthDirectives
@@ -22,7 +23,7 @@ class Registration(
     pathPrefix("users") {
         pathPrefix("login") {
           handleRejections(loginRejectionHandlers){
-            withLogin(login) { user=>
+            withLogin(usernameLogin,emailLogin) { user=>
                 withSession(user.username, getToken) { token =>
                   setCookie(HttpCookie("token", content = token)) {
                     complete(s"The user ${user.username} was logged in")
@@ -41,7 +42,12 @@ class Registration(
             }
           }
         }
+      }~
+      pathPrefix("logout"){
+          deleteCookie("token") {
+            complete(s"the user has been logged out!")
+          }
+        }
       }
-   }
 }
 

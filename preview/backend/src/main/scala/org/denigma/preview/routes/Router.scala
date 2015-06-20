@@ -11,7 +11,8 @@ class Router extends Directives {
 
   def routes = new Head().routes ~
     new Registration(
-      loginController.login,
+      loginController.loginByName,
+      loginController.loginByEmail,
       loginController.register,
       sessionController.withToken)
       .routes ~

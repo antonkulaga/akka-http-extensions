@@ -11,28 +11,56 @@ import scala.concurrent.Future
  */
 class InMemoryLoginController extends FutureLoginController {
 
-  var users:Map[String,LoginInfo] = Map.empty
+  protected var usersByName:Map[String,LoginInfo] = Map.empty
+  protected var usersByEmail:Map[String,LoginInfo] = Map.empty
 
-  override def login(username: String, password: String): Future[LoginResult] = users.get(username) match {
+  def addUser(user:LoginInfo) = {
+    usersByName =usersByName + (user.username -> user)
+    usersByEmail =usersByEmail + (user.email -> user)
+    this
+  }
+
+  def removeUser(user:LoginInfo) = {
+    usersByName =usersByName -  user.username
+    usersByEmail =usersByEmail - user.email
+    this
+  }
+
+  def isValidEmail(email: String): Boolean = """(\w+)@([\w\.]+)""".r.unapplySeq(email).isDefined
+
+  override def loginByName(username: String, password: String): Future[LoginResult] = usersByName.get(username) match {
     case None=> Future.successful(UserDoesNotExist(username))
     case Some(user)=>
       Future.successful(if(password.isBcrypted(user.password)) LoggedIn(user) else PasswordDoesNotMuch(username,password))
   }
 
 
+  override def loginByEmail(email: String, password: String): Future[LoginResult] = usersByEmail.get(email) match {
+    case None=> Future.successful(EmailDoesNotExist(email))
+    case Some(user)=>
+      Future.successful(if(password.isBcrypted(user.password)) LoggedIn(user) else PasswordDoesNotMuch(email,password))
+  }
 
-  def clean() =  users = BiMap.empty //for testing
 
-  override def register(username: String, password: String, email: String): Future[RegistrationResult] =
-    users.get(username) match
-    {
-      case Some(user)=> Future.successful(UserAlreadyExists(LoginInfo(username,password,email)))
-      case None if password.length<4=>Future.successful(BadPassword(LoginInfo(username,password,email),"password is too short"))
-      case None if password==username => Future.successful(BadPassword(LoginInfo(username,password,email),"password and username cannot be same"))
+
+  def clean() =  {
+    usersByName = Map.empty
+    usersByEmail = Map.empty
+  }
+
+  override def register(username: String, password: String, email: String): Future[RegistrationResult] = {
+    val registerInfo = LoginInfo(username, password, email)
+    usersByName.get(username) match {
+      case Some(existed) => Future.successful(UserAlreadyExists(existed))
+      case None if password.length < 4 => Future.successful(BadPassword(registerInfo, "password is too short"))
+      case None if password == username => Future.successful(BadPassword(registerInfo, "password and username cannot be same"))
+      case None if !this.isValidEmail(email) => Future.successful(BadEmail(registerInfo,s"$email is not an email!"))
       case None =>
         val hash = password.bcrypt
-        users = users + (username -> LoginInfo(username,hash,email))
-        Future.successful(UserRegistered(LoginInfo(username,hash,email)))
+        val user = registerInfo.copy(password = hash)
+        this.addUser(user)
+        Future.successful(UserRegistered(user))
     }
+  }
 
 }

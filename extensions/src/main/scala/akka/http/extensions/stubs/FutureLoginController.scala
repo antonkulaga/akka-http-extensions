@@ -6,7 +6,9 @@ import scala.concurrent.Future
 
 trait FutureLoginController{
   
-  def login(username:String,passw:String):Future[LoginResult]
+  def loginByName(username:String,passw:String):Future[LoginResult]
+
+  def loginByEmail(username:String,passw:String):Future[LoginResult]
 
   def register(username:String,passw:String,email:String):Future[RegistrationResult]
 

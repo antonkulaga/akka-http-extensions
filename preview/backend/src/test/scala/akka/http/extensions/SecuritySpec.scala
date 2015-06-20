@@ -2,6 +2,7 @@ package akka.http.extensions
 
 import akka.http.extensions.security.{AES, RegistrationResult, LoginInfo}
 import akka.http.extensions.stubs.{InMemorySessionController, InMemoryLoginController}
+import akka.http.scaladsl.model.headers.`Set-Cookie`
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.denigma.preview.routes.Registration
@@ -16,7 +17,7 @@ class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFut
 
   object loginController extends  InMemoryLoginController{
 
-    def checkPassword(username:String,password:String): Boolean = users.get(username) match{
+    def checkPassword(username:String,password:String): Boolean = usersByName.get(username) match{
       case Some(u)=> password.isBcrypted(u.password)
       case None => false
     }
@@ -26,7 +27,8 @@ class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFut
   object sessionController extends InMemorySessionController
 
   object logins extends Registration(
-    loginController.login,
+    loginController.loginByName,
+    loginController.loginByEmail,
     loginController.register,
     sessionController.withToken)
   import loginController._
@@ -63,24 +65,40 @@ class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFut
     }
 
 
-    "generate cookies on login" in {
+    "login by name with cookies" in {
       loginController.register("anton","test","antonkulaga@gmail.com")
       Get("/users/login?username=anton&password=test") ~> logins.routes ~> check{
                 val resp =  responseAs[String]
-                println("RESP: "+resp)
                 responseAs[String] shouldEqual "The user anton was logged in"
-        /*       val tokOpt = sessionController.getToken("anton")
+               val tokOpt = sessionController.getToken("anton")
                 tokOpt.isDefined shouldEqual true
                 val tok = tokOpt.get
                 val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
                 hop.isDefined shouldEqual(true)
                 val h = hop.get.cookie
                 h.name shouldEqual  "token"
-                h.content shouldEqual tok*/
+                h.content shouldEqual tok
         loginController.clean()
       }
     }
 
+
+    "login by email with cookies" in {
+      loginController.register("anton","test","antonkulaga@gmail.com")
+      Get("/users/login?email=antonkulaga@gmail.com&password=test") ~> logins.routes ~> check{
+        val resp =  responseAs[String]
+        responseAs[String] shouldEqual "The user anton was logged in"
+        val tokOpt = sessionController.getToken("anton")
+        tokOpt.isDefined shouldEqual true
+        val tok = tokOpt.get
+        val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
+        hop.isDefined shouldEqual(true)
+        val h = hop.get.cookie
+        h.name shouldEqual  "token"
+        h.content shouldEqual tok
+        loginController.clean()
+      }
+    }
 
 
   }

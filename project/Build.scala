@@ -29,7 +29,7 @@ class PreviewBuild extends LibraryBuild
 	lazy val controls = crossProject
 	  .crossType(CrossType.Full)
 	  .in(file("preview/controls"))
-	  .settings(commonSettings: _*)
+	  .settings(commonSettings++publishSettings: _*)
 	  .settings(version := Versions.controls)
 	  .jsSettings(libraryDependencies ++= Dependencies.sjsLibs.value++Dependencies.templates.value)
 	  .settings(name := "binding-controls")

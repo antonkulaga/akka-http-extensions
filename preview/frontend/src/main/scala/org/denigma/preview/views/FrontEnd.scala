@@ -3,7 +3,7 @@ package org.denigma.preview.views
 import org.denigma.binding.extensions._
 import org.denigma.binding.views.BindableView
 import org.denigma.binding.views.utils.ViewInjector
-import org.denigma.controls.{Session, LoginView}
+import org.denigma.controls.login.{Session, LoginView}
 import org.querki.jquery._
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement

@@ -1,7 +1,6 @@
 package akka.http.extensions.security
 
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 
 import scala.concurrent.Future
@@ -21,6 +20,7 @@ sealed trait FutureLoginMagnet {
         .flatMap{
         case e:UserDoesNotExist =>  ctx.reject(e)
         case p:PasswordDoesNotMuch =>  ctx.reject(p)
+        case e:EmailDoesNotExist =>  ctx.reject(e)
         case l:LoggedIn =>inner(Tuple1(l.user))(ctx)
       }
         .recoverWith{
@@ -36,6 +36,20 @@ sealed trait FutureLoginMagnet {
     LoginMagnet(dir)
   }
 
+
+
+  implicit def futureLoginDefault(logins: (FutureLogin,FutureLogin)):LoginMagnet =
+  {
+    val dir: Directive1[LoginInfo] =
+      Directives.parameter("username","password") //login by username
+        .tflatMap{  case (username,password)=>  futureLoginDirective((username,password,logins._1))  }  |
+        Directives.parameter("email","password") //login by email
+          .tflatMap{  case (email,password)=>  futureLoginDirective((email,password,logins._2))  }
+    LoginMagnet(dir)
+  }
+
+
+
   implicit def futureLogin(params:(String,String, FutureLogin)):LoginMagnet =
     LoginMagnet(futureLoginDirective(params) )
 }
@@ -49,6 +63,7 @@ sealed trait TryLoginMagnet {
       login(username,password) match {
         case Success(e:UserDoesNotExist) =>  ctx.reject(e)
         case Success(p:PasswordDoesNotMuch) =>  ctx.reject(p)
+        case Success(e:EmailDoesNotExist) =>  ctx.reject(e)
         case Success(l:LoggedIn) =>inner(Tuple1(l.user))(ctx)
         case Failure(th) =>ctx.reject(ReadErrorRejection(s"cannot login $username",th))
       }
