@@ -25,8 +25,8 @@ class Registration(
           handleRejections(loginRejectionHandlers){
             withLogin(usernameLogin,emailLogin) { user=>
                 withSession(user.username, getToken) { token =>
-                  setCookie(HttpCookie("token", content = token)) {
-                    complete(s"The user ${user.username} was logged in")
+                  setCookie(HttpCookie("token", content = token)) { c=>
+                    c.complete(s"The user ${user.username} was logged in")
                 }
               }
             }
@@ -36,16 +36,16 @@ class Registration(
         handleRejections(registerRejectionHandlers){
           withRegistration(register) {  user=>
             withSession(user.username, getToken) { token =>
-              setCookie(HttpCookie("token", content = token)) {
-                complete(s"The user ${user.username} has been registered")
+              setCookie(HttpCookie("token", content = token)) { c=>
+                c.complete(s"The user ${user.username} has been registered")
               }
             }
           }
         }
       }~
       pathPrefix("logout"){
-          deleteCookie("token") {
-            complete(s"the user has been logged out!")
+          deleteCookie("token") { c=>
+            c.complete(s"the user has been logged out!")
           }
         }
       }

@@ -60,9 +60,4 @@ trait BasicLogin extends BindableView
    def reportError(str:String) = dom.console.error(this.report(str))
 
 
-   def tellCookies() = { //for testing
-     val cookies = dom.document.cookie.split(";")
-     dom.console.log("cookies are:\n"+cookies.mkString("\n"))
-   }
-
  }

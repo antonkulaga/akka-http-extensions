@@ -30,7 +30,7 @@ class MenuView(val elem:HTMLElement, val params:Map[String,Any] = Map.empty) ext
 
   override type Item = String
 
-  override def newItem(item: Item) = this.constructItem(item){ case (el,mp)=> //TODO: rename constructItem to smt like ConstructItemView
+  override def newItem(item: Item) = this.constructItemView(item){ case (el,mp)=> //TODO: rename constructItem to smt like ConstructItemView
     new MenuItem(el,item,mp)
   }
 

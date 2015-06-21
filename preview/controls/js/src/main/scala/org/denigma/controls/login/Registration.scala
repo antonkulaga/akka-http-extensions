@@ -1,5 +1,6 @@
 package org.denigma.controls.login
 import org.denigma.binding.extensions._
+import org.scalajs.dom
 import org.scalajs.dom.ext.{Ajax, AjaxException}
 import rx.{Rx, Var}
 
@@ -42,7 +43,7 @@ trait Registration extends BasicLogin{
    }
 
    protected def register() =  Ajax.get(
-     sq.h(s"users/register?username=${this.login.now}&password=${this.password.now}&email=${this.email.now}"),
+     s"/users/register?username=${this.login.now}&password=${this.password.now}&email=${this.email.now}",
      withCredentials = true
    )
 
@@ -52,8 +53,7 @@ trait Registration extends BasicLogin{
      this.register().onComplete{
 
        case Success(req) =>
-
-         this.tellCookies()
+         dom.console.log("COOKIES: :\n"+dom.document.cookie)
          Session.login(login.now)
 
        case Failure(ex:AjaxException) =>

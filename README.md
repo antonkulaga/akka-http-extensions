@@ -113,5 +113,5 @@ Basic session directive to store tokens.
 
 4 Utils and stubs
 ------------------
-* Some inmemory controllers for testing loging and registration
+* Some inmemory controllers for testing logging and registration
 * BiMap - bidirectional map, it is missing in scala collections =(

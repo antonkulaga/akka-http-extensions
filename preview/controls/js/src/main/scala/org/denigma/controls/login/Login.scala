@@ -34,8 +34,8 @@ trait Login extends BasicLogin{
    }
 
    def auth() = Ajax.get(
-     sq.h(s"users/login?${if(loginWithEmail.now) "email" else "username"}=${this.login.now}&password=${this.password.now}")
-     ,withCredentials = true
+     s"/users/login?${if(loginWithEmail.now) "email" else "username"}=${this.login.now}&password=${this.password.now}",
+     withCredentials = true
    )
 
    val authClick = loginClick.takeIfAll(canLogin,inLogin)
@@ -43,9 +43,7 @@ trait Login extends BasicLogin{
      this.auth().onComplete{
 
        case Success(req) =>
-         dom.console.log("RESPONSE IS "+req.responseText)
-         this.tellCookies()
-         //dom.alert("authed successfuly")
+         dom.console.log(dom.document.cookie)
          Session.login(login.now)
        //TODO: get full username
        //Session.setUser(user)

@@ -2,7 +2,6 @@ package org.denigma.preview.routes
 
 import akka.http.extensions.stubs._
 import akka.http.scaladsl.server.Directives
-import org.denigma.preview.routes.Registration
 
 
 class Router extends Directives {
