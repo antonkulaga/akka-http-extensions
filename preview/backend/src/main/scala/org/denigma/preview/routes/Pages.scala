@@ -12,7 +12,7 @@ class Pages extends Directives with PJax{
   }
 
   def index =  pathSingleSlash{ctx=>
-    ctx.flowMaterializer.executionContext
+    ctx.materializer.executionContext
     ctx.complete {
       HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, html.index(defaultPage).body  ))
     }

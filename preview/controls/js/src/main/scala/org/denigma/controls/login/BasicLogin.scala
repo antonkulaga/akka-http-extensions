@@ -1,4 +1,6 @@
 package org.denigma.controls.login
+
+import org.denigma.binding.binders.Events
 import org.denigma.binding.binders.extractors.EventBinding
 import org.denigma.binding.extensions._
 import org.denigma.binding.views.BindableView
@@ -38,9 +40,9 @@ trait BasicLogin extends BindableView
    val validPassword:Rx[Boolean] = password.map(p=>p.length>4 && p!=login.now)
    val canLogin = Rx{validUsername() && validPassword()}
 
-   val loginClick: Var[MouseEvent] = Var(EventBinding.createMouseEvent(),"loginClick")
-   val logoutClick: Var[MouseEvent] = Var(EventBinding.createMouseEvent(),"logoutClick")
-   val signupClick: Var[MouseEvent] = Var(EventBinding.createMouseEvent(),"signupClick")
+   val loginClick: Var[MouseEvent] = Var(Events.createMouseEvent(),"loginClick")
+   val logoutClick: Var[MouseEvent] = Var(Events.createMouseEvent(),"logoutClick")
+   val signupClick: Var[MouseEvent] = Var(Events.createMouseEvent(),"signupClick")
 
    def report(req:org.scalajs.dom.XMLHttpRequest): String = req.response.dyn.message match {
      case m if m.isNullOrUndef => this.report(req.responseText)

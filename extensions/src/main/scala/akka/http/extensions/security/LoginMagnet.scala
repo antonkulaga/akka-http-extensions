@@ -28,13 +28,10 @@ sealed trait FutureLoginMagnet {
       }
     }
 
-  implicit def futureLoginDefault(tryLogin: FutureLogin):LoginMagnet =
-  {
-    val dir =
+  implicit def futureLoginDefault(tryLogin: FutureLogin):LoginMagnet =    LoginMagnet(
       Directives.parameter("username","password") //todo add email support
-      .tflatMap{  case (username,password)=>  futureLoginDirective((username,password,tryLogin))  }
-    LoginMagnet(dir)
-  }
+        .tflatMap{  case (username,password)=>  futureLoginDirective((username,password,tryLogin))  }
+  )
 
 
 

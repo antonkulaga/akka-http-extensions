@@ -1,0 +1,126 @@
+@import Main._
+@sect{akka-http-extensions}
+  @a(
+    href:="https://github.com/denigma/akka-http-extensions",
+    position.absolute,
+    top:=0,right:=0,border:=0,
+    img(
+      src:="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67",
+      alt:="Fork me on GitHub"
+    )
+  )
+  @p
+    Useful directives and utils for akka-http projects.
+  @sect{Getting started}
+    @p
+        Just add the library to your sbt dependencies:
+    @hl.scala
+        resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
+
+        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.2-RC4"
+    @p
+        Then you can simply extends AuthDirectives in your routes.
+
+  @sect{Features}
+    @p
+      The project was initiated because we had several akka-http projects and wanted to share the most common features and patterns.
+    @p
+      At the moment there are:
+    @sect{Login/registration custom directives}
+      @p
+        Login/registration is common for all apps.
+        Here we provide some directives to make them easier as well encyption support (bcrypt is used to create password hashes).
+      @p
+        Here how it looks like:
+      @hl.scala
+        class Registration(
+                         login:(String,String)=>Future[LoginResult],
+                         register:(String,String,String)=>Future[RegistrationResult],
+                         getToken:String=>Future[String]
+                         ) extends AuthDirectives
+                       with Directives
+                       with WithLoginRejections
+                       with WithRegistrationRejections
+        {
+
+
+
+        def routes: Route =
+         pathPrefix("users") {
+             pathPrefix("login") {
+               handleRejections(loginRejectionHandlers){
+                 withLogin(login) { user=>
+                     withSession(user.username, getToken) { token =>
+                       setCookie(HttpCookie("token", content = token)) {
+                         complete(s"The user ${user.username} was logged in")
+                     }
+                   }
+                 }
+               }
+             }~
+           pathPrefix("register"){
+             handleRejections(registerRejectionHandlers){
+               withRegistration(register) {  user=>
+                 withSession(user.username, getToken) { token =>
+                   setCookie(HttpCookie("token", content = token)) {
+                     complete(s"The user ${user.username} has been registered")
+                   }
+                 }
+               }
+             }
+           }
+        }
+        }
+    @sect{Pjax support}
+      @p
+        PJax is a technique that makes it easier to load html pages without page reload.
+        The idea is that P-JAX header is added to all your ajax requests.
+        So backend looks at the headers and loads whole template if there is not P-JAX header
+        or only a part of template if it was called for ajax.
+      @p
+        In Preview backend you can see P-JAX implementation for Twirl. Here is an example of test Router with PJax directive:
+      @hl.scala
+        def test = pathPrefix("test"~Slash) { ctx=>
+            pjax[Twirl](Html(s"<h1>${ctx.unmatchedPath}</h1>"),loadPage){h=>c=>
+              val resp = HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, h.body  ))
+              c.complete(resp)
+            }(ctx)
+          }
+    @sect{Session directive}
+        @p
+          Basic session directive to store tokens.
+
+    @sect{Utils and stubs}
+      @p
+        Some inmemory controllers for testing logging and registration
+      @p
+        BiMap - bidirectional map, it is missing in scala collections =(
+
+
+  @sect{Running examples}
+    @p
+      This git repository contains some useful classes and directives for akka-http.
+      akka.http.extensions are located in extensions subprojects. All other code is for previews.
+
+    @p
+      The project contains 4 subprojects::
+      @ul
+        @li
+          extensions - the library itself, it is the artifact that is published
+        @li
+          preview/backend - scala backend example + tests
+        @li
+          preview/controls -  some shared between backend and frontend of the preview example
+        @li
+          preview/frontend - ScalaJS frontend for the example
+
+    @p
+      To run the project you must have SBT ( http://www.scala-sbt.org/ ) installed.
+
+    @p
+      To run project:
+      @hl.sh
+          sbt //to opens sbt console
+          re-start //Use this command **instead of** run to run the app
+          Open localhost:1234 to see the result, it should reload whenever any sources are change
+

@@ -10,14 +10,14 @@ import spray.revolver.RevolverPlugin._
 import play.twirl.sbt._
 import play.twirl.sbt.SbtTwirl.autoImport._
 import com.typesafe.sbt.web.SbtWeb.autoImport._
-
+import scalatex.ScalatexReadme
 
 object Build extends PreviewBuild {
 
 	lazy val root = Project("root",file("."),settings = commonSettings)
 		.settings(
 			mainClass in Compile := (mainClass in backend in Compile).value,
-			libraryDependencies += "com.lihaoyi" % "ammonite-repl" % Versions.ammonite cross CrossVersion.full,
+      libraryDependencies += "com.lihaoyi" % "ammonite-repl_2.11.6" %  Versions.ammonite,
 			initialCommands in console := """ammonite.repl.Repl.run("")""" //better console
 		) dependsOn backend aggregate(backend,frontend)
 }
@@ -58,6 +58,14 @@ class PreviewBuild extends LibraryBuild
 			watchSources <++= (watchSources in frontend),
       (managedClasspath in Runtime) += (packageBin in Assets).value
 		).enablePlugins(SbtTwirl,SbtWeb).dependsOn(controlsJVM,extensions).aggregate(extensions)
+
+	/** Scalatex banana-rdf website, see http://lihaoyi.github.io/Scalatex/#QuickStart */
+	lazy val readme = scalatex.ScalatexReadme(
+		projectId = "readme",
+		wd = file(""),
+		url = "https://github.com/denigma/akka-http-extensions/tree/master",
+		source = "Readme"
+	)
 
 }
 

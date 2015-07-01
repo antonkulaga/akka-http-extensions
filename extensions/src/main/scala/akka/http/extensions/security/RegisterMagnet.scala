@@ -1,7 +1,6 @@
 package akka.http.extensions.security
 
 import akka.http.scaladsl.server._
-import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 
 import scala.concurrent.Future

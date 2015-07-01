@@ -1,18 +1,11 @@
 package org.denigma.controls.login
-import org.denigma.binding.binders.extractors.EventBinding
 import org.denigma.binding.extensions._
-import org.denigma.binding.views.BindableView
 import org.scalajs.dom
-import org.scalajs.dom._
 import org.scalajs.dom.ext.{Ajax, AjaxException}
-import org.scalajs.dom.raw.HTMLElement
 import rx.ops._
-import rx.{Rx, Var}
 
-import scala.collection.immutable._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.{Failure, Success}
-import org.denigma.binding.extensions._
 
 /**
   * Deals with login features

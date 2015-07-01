@@ -1,43 +1,94 @@
 package akka.http.extensions
 
-import akka.http.extensions.security.{AES, RegistrationResult, LoginInfo}
+import akka.http.extensions.security._
 import akka.http.extensions.stubs.{InMemorySessionController, InMemoryLoginController}
 import akka.http.scaladsl.model.headers.`Set-Cookie`
-import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.denigma.preview.routes.Registration
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
-import com.github.t3hnar.bcrypt._
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import com.github.t3hnar.bcrypt._
 
-class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFutures with  ScalatestRouteTest
-{
+trait Controllers {
 
-  object loginController extends  InMemoryLoginController{
+  class TestLoginController extends  InMemoryLoginController{
 
     def checkPassword(username:String,password:String): Boolean = usersByName.get(username) match{
       case Some(u)=> password.isBcrypted(u.password)
       case None => false
     }
-    def register(user:LoginInfo): Future[RegistrationResult] = this.register(user.username,user.email,user.password)
+    def register(user:LoginInfo): Future[RegistrationResult] = this.register(user.username,user.password,user.email)
   }
 
-  object sessionController extends InMemorySessionController
+  class TestSessionController extends InMemorySessionController
 
-  object logins extends Registration(
+  class Permissions(sessionController: TestSessionController) extends AuthDirectives with Directives//to test permissions
+  {
+    case object OtherRealm extends Realm
+
+    var drugs:Set[String] = Set.empty
+
+     val permissions = new mutable.HashMap[Realm, Set[LoginInfo]] with mutable.MultiMap[Realm, LoginInfo]
+
+    def checkRights(user:LoginInfo,realm:Realm):Boolean = permissions.get(realm).contains(user)
+    def add2realm(user:LoginInfo,realm: Realm) ={
+      permissions.addBinding(realm,user)
+    }
+
+    def removeFromRealm(user:LoginInfo,realm: Realm) ={
+      permissions.removeBinding(realm,user)
+    }
+
+    def routes: Route =
+      pathPrefix("add") {
+        pathPrefix("drug") {
+          put
+          {
+            parameter("name"){name=>
+              authenticate(sessionController.userByToken _){ user=>
+                authorize(user,UserRealm,checkRights _)
+                {
+                  drugs = drugs + name
+                  complete("drug added!")
+                }
+              }
+            }
+          }
+
+        }
+      }
+  }
+
+  class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends Registration(
     loginController.loginByName,
     loginController.loginByEmail,
     loginController.register,
     sessionController.withToken)
-  import loginController._
+
+
+}
+
+class SecuritySpec  extends WordSpec
+  with Matchers
+  with Directives
+  with ScalaFutures
+  with ScalatestRouteTest
+  with Controllers
+{
+
 
   val timeout = 500 millis
   implicit override val patienceConfig = new PatienceConfig(timeout)
 
+
   "authorization" should {
     "encode passwords with bcrypt" in {
+      val loginController = new  TestLoginController
+      import loginController._
       val (a,s,x) = (
         register("anton","pass1","antonku@gmail.com") ,
         register("sasha","pass2","sasha@gmail.com") ,
@@ -48,7 +99,7 @@ class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFut
       checkPassword("sasha","pass2") shouldEqual true
       checkPassword("sasha","pass3") shouldEqual false
       checkPassword("karmen","pass3") shouldEqual false
-      loginController.clean()
+      clean()
     }
 
     "be able to encode/decode with AES" in {
@@ -66,39 +117,60 @@ class SecuritySpec  extends WordSpec with Matchers with Directives with ScalaFut
 
 
     "login by name with cookies" in {
-      loginController.register("anton","test","antonkulaga@gmail.com")
-      Get("/users/login?username=anton&password=test") ~> logins.routes ~> check{
+      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
+      val loginController = new TestLoginController
+      loginController.register(anton)
+      val sessionController = new TestSessionController
+      val logins = new Logins(loginController,sessionController)
+      Put("/users/login?username=anton&password=test2test") ~> logins.routes ~> check{
                 val resp =  responseAs[String]
                 responseAs[String] shouldEqual "The user anton was logged in"
-               val tokOpt = sessionController.getToken("anton")
+                val tokOpt = sessionController.tokenByUsername("anton")
                 tokOpt.isDefined shouldEqual true
                 val tok = tokOpt.get
                 val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
                 hop.isDefined shouldEqual(true)
                 val h = hop.get.cookie
                 h.name shouldEqual  "token"
-                h.content shouldEqual tok
-        loginController.clean()
+                h.pair().value shouldEqual tok
       }
     }
 
 
-    "login by email with cookies" in {
-      loginController.register("anton","test","antonkulaga@gmail.com")
+    "authorizing actions" in {
+      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
+      val loginController = new TestLoginController
+      loginController.register(anton)
+      val sessionController = new TestSessionController
+      val logins = new Logins(loginController,sessionController)
       Get("/users/login?email=antonkulaga@gmail.com&password=test") ~> logins.routes ~> check{
+
+      }
+    }
+
+/*
+    "check permissions" in {
+      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
+      val loginController = new TestLoginController
+      loginController.register(anton)
+      new Permissions()
+      val sessionController = new TestSessionController
+      val logins = new Logins(loginController,sessionController)
+      Put("/users/login?email=antonkulaga@gmail.com&password=test2test") ~> logins.routes ~> check{
         val resp =  responseAs[String]
         responseAs[String] shouldEqual "The user anton was logged in"
-        val tokOpt = sessionController.getToken("anton")
+        val tokOpt = sessionController.tokenByUsername("anton")
+        println(sessionController.tokens.mkString("\n"))
         tokOpt.isDefined shouldEqual true
         val tok = tokOpt.get
         val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
         hop.isDefined shouldEqual(true)
         val h = hop.get.cookie
         h.name shouldEqual  "token"
-        h.content shouldEqual tok
-        loginController.clean()
+        h.pair().value shouldEqual tok
       }
     }
+*/
 
 
   }

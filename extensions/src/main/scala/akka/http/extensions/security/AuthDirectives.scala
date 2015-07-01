@@ -2,14 +2,19 @@ package akka.http.extensions.security
 
 import akka.http.scaladsl.server._
 
+import akka.http.scaladsl.server.Directives
 
 trait AuthDirectives {
 
-  def withSession(magnet: SessionMagnet): Directive[Tuple1[String]] = magnet.directive
+  def startSession(magnet: TokenMagnet): Directive0 = magnet.directive
 
-  def withLogin(magnet: LoginMagnet): Directive1[LoginInfo] = magnet.directive
+  def login(magnet: LoginMagnet): Directive1[LoginInfo] = magnet.directive
 
-  def withRegistration(magnet:RegisterMagnet): Directive1[LoginInfo] = magnet.directive
+  def registration(magnet:RegisterMagnet): Directive1[LoginInfo] = magnet.directive
+
+  def authorize(permission:PermissionMagnet):Directive0 = permission.directive
+
+  def authenticate(magnet: AuthenticateMagnet): Directive1[magnet.Result] = magnet.directive
 
 }
 

@@ -14,10 +14,13 @@ class InMemoryLoginController extends FutureLoginController {
   protected var usersByName:Map[String,LoginInfo] = Map.empty
   protected var usersByEmail:Map[String,LoginInfo] = Map.empty
 
-  def addUser(user:LoginInfo) = {
+  def addUser(user:LoginInfo,computeHash:Boolean = true): LoginInfo =if(computeHash)
+    addUser(this.withHash(user),false)
+  else
+  {
     usersByName =usersByName + (user.username -> user)
     usersByEmail =usersByEmail + (user.email -> user)
-    this
+    user
   }
 
   def removeUser(user:LoginInfo) = {
@@ -48,6 +51,7 @@ class InMemoryLoginController extends FutureLoginController {
     usersByEmail = Map.empty
   }
 
+
   override def register(username: String, password: String, email: String): Future[RegistrationResult] = {
     val registerInfo = LoginInfo(username, password, email)
     usersByName.get(username) match {
@@ -56,10 +60,7 @@ class InMemoryLoginController extends FutureLoginController {
       case None if password == username => Future.successful(BadPassword(registerInfo, "password and username cannot be same"))
       case None if !this.isValidEmail(email) => Future.successful(BadEmail(registerInfo,s"$email is not an email!"))
       case None =>
-        val hash = password.bcrypt
-        val user = registerInfo.copy(password = hash)
-        this.addUser(user)
-        Future.successful(UserRegistered(user))
+        Future.successful(UserRegistered(addUser(registerInfo)))
     }
   }
 
