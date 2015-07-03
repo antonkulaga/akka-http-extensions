@@ -4,6 +4,9 @@ import akka.http.scaladsl.server._
 
 import akka.http.scaladsl.server.Directives
 
+/**
+ * just inherit from this trait to use new directives
+ */
 trait AuthDirectives {
 
   def startSession(magnet: TokenMagnet): Directive0 = magnet.directive

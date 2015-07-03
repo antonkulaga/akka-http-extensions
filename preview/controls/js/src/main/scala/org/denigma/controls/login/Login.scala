@@ -26,7 +26,7 @@ trait Login extends BasicLogin{
      this.inRegistration() = false
    }
 
-   def auth() = Ajax.get(
+   def auth() = Ajax.put(
      s"/users/login?${if(loginWithEmail.now) "email" else "username"}=${this.login.now}&password=${this.password.now}",
      withCredentials = true
    )

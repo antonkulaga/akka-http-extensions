@@ -17,7 +17,9 @@ class Router extends Directives {
       loginController.loginByName,
       loginController.loginByEmail,
       loginController.register,
-      sessionController.withToken)
+      sessionController.userByToken,
+      sessionController.makeToken
+    )
       .routes ~
     new Pages().routes
 

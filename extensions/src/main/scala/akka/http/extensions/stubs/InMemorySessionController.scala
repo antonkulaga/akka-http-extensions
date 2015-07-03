@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class InMemorySessionController extends SessionController {
   var tokens:BiMap[String,LoginInfo] = BiMap.empty //token->username
 
-  override def withToken(user: LoginInfo): Future[String] = tokens.inverse.get(user) match
+  override def makeToken(user: LoginInfo): Future[String] = tokens.inverse.get(user) match
     {
       case Some(token)=> Future.successful(token)
       case None=>
@@ -21,6 +21,12 @@ class InMemorySessionController extends SessionController {
         tokens = tokens + (token->user)
         Future.successful(token)
     }
+
+  def setToken(user:LoginInfo) = {
+    val token = UUID.randomUUID().toString
+    tokens = tokens + (token->user)
+    token
+  }
 
 
 

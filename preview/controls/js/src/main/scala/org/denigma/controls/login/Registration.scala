@@ -42,7 +42,7 @@ trait Registration extends BasicLogin{
      this.inRegistration() = true
    }
 
-   protected def register() =  Ajax.get(
+   protected def register() =  Ajax.put(
      s"/users/register?username=${this.login.now}&password=${this.password.now}&email=${this.email.now}",
      withCredentials = true
    )
@@ -54,6 +54,8 @@ trait Registration extends BasicLogin{
 
        case Success(req) =>
          dom.console.log("COOKIES: :\n"+dom.document.cookie)
+         println(req.getAllResponseHeaders())
+         println(req.getResponseHeader("SET-COOKIE"))
          Session.login(login.now)
 
        case Failure(ex:AjaxException) =>

@@ -59,10 +59,10 @@ sealed trait AuthenticateMagnet{
 
 object AuthenticateMagnet {
 
-  implicit def usernameByToken(getName:(String=>Option[String])) = new OptionalMagnet[String](getName)
-  implicit def loginInfoByToken(getName:(String=>Option[LoginInfo])) = new OptionalMagnet[LoginInfo](getName)
-  implicit def futureUsernameByToken(getName:(String=>Future[String])) = new FutureMagnet[String](getName)
-  implicit def futureLoginInfoByToken(getName:(String=>Future[LoginInfo])) = new FutureMagnet[LoginInfo](getName)
+  implicit def usernameByToken(getName:String=>Option[String]): OptionalMagnet[String] = new OptionalMagnet[String](getName)
+  implicit def loginInfoByToken(getName:String=>Option[LoginInfo]): OptionalMagnet[LoginInfo] = new OptionalMagnet[LoginInfo](getName)
+  implicit def futureUsernameByToken(getName:String=>Future[String]): FutureMagnet[String] = new FutureMagnet[String](getName)
+  implicit def futureLoginInfoByToken(getName:String=>Future[LoginInfo]): FutureMagnet[LoginInfo] = new FutureMagnet[LoginInfo](getName)
 
 }
 

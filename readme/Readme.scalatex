@@ -34,42 +34,46 @@
         Here how it looks like:
       @hl.scala
         class Registration(
-                         login:(String,String)=>Future[LoginResult],
-                         register:(String,String,String)=>Future[RegistrationResult],
-                         getToken:String=>Future[String]
-                         ) extends AuthDirectives
-                       with Directives
-                       with WithLoginRejections
-                       with WithRegistrationRejections
+                            usernameLogin:(String,String)=>Future[LoginResult],
+                            emailLogin:(String,String)=>Future[LoginResult],
+                            register:(String,String,String)=>Future[RegistrationResult],
+                            userByToken:String=>Option[LoginInfo],
+                            makeToken:LoginInfo=>Future[String]
+                            ) extends AuthDirectives
+                          with Directives
+                          with WithLoginRejections
+                          with WithRegistrationRejections
         {
-
-
-
-        def routes: Route =
-         pathPrefix("users") {
-             pathPrefix("login") {
-               handleRejections(loginRejectionHandlers){
-                 withLogin(login) { user=>
-                     withSession(user.username, getToken) { token =>
-                       setCookie(HttpCookie("token", content = token)) {
-                         complete(s"The user ${user.username} was logged in")
-                     }
-                   }
-                 }
-               }
-             }~
-           pathPrefix("register"){
-             handleRejections(registerRejectionHandlers){
-               withRegistration(register) {  user=>
-                 withSession(user.username, getToken) { token =>
-                   setCookie(HttpCookie("token", content = token)) {
-                     complete(s"The user ${user.username} has been registered")
-                   }
-                 }
-               }
-             }
-           }
-        }
+          def routes: Route =
+            pathPrefix("users") {
+              pathPrefix("login") {
+                put {
+                  handleRejections(loginRejectionHandlers) {
+                    login(usernameLogin, emailLogin) { user =>
+                      startSession(user, makeToken) {
+                        complete(s"The user ${user.username} was logged in")
+                      }
+                    }
+                  }
+                }
+              } ~
+                pathPrefix("register") {
+                  put {
+                    handleRejections(registerRejectionHandlers) {
+                      registration(register) { user =>
+                        startSession(user, makeToken) {
+                          complete(s"The user ${user.username} has been registered")
+                        }
+                      }
+                    }
+                  }
+                } ~
+                pathPrefix("logout") {
+                  deleteCookie("token") { c =>
+                    c.complete(s"The user was logged out")
+                }
+              }
+            }
         }
     @sect{Pjax support}
       @p
@@ -86,9 +90,15 @@
               c.complete(resp)
             }(ctx)
           }
-    @sect{Session directive}
+    @sect{Authenticate directive}
         @p
           Basic session directive to store tokens.
+        @hl.scala
+          pathPrefix("testtoken"){
+                    this.authenticate(userByToken){user=>
+                      complete(user.username)
+                    }
+                  }
 
     @sect{Utils and stubs}
       @p

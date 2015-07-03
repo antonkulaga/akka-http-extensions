@@ -18,7 +18,7 @@ trait FutureLoginController{
 
 trait SessionController{
 
-  def withToken(user:LoginInfo):Future[String]
+  def makeToken(user:LoginInfo):Future[String]
 
   def userByToken(token: String): Option[LoginInfo]
 

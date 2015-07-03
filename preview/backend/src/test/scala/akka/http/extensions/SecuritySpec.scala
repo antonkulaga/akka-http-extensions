@@ -1,8 +1,12 @@
 package akka.http.extensions
 
+import java.util.UUID
+
 import akka.http.extensions.security._
 import akka.http.extensions.stubs.{InMemorySessionController, InMemoryLoginController}
-import akka.http.scaladsl.model.headers.`Set-Cookie`
+import akka.http.scaladsl.model.{DateTime, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.headers.{HttpCookie, Cookie, `Set-Cookie`}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.denigma.preview.routes.Registration
@@ -32,7 +36,7 @@ trait Controllers {
 
     var drugs:Set[String] = Set.empty
 
-     val permissions = new mutable.HashMap[Realm, Set[LoginInfo]] with mutable.MultiMap[Realm, LoginInfo]
+     val permissions = new mutable.HashMap[Realm, mutable.Set[LoginInfo]] with mutable.MultiMap[Realm, LoginInfo]
 
     def checkRights(user:LoginInfo,realm:Realm):Boolean = permissions.get(realm).contains(user)
     def add2realm(user:LoginInfo,realm: Realm) ={
@@ -64,10 +68,12 @@ trait Controllers {
   }
 
   class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends Registration(
-    loginController.loginByName,
-    loginController.loginByEmail,
-    loginController.register,
-    sessionController.withToken)
+      loginController.loginByName,
+      loginController.loginByEmail,
+      loginController.register,
+      sessionController.userByToken,
+      sessionController.makeToken
+    )
 
 
 }
@@ -79,6 +85,10 @@ class SecuritySpec  extends WordSpec
   with ScalatestRouteTest
   with Controllers
 {
+
+  val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
+  val paul = LoginInfo("paul","test2paul","paul@gmail.com")
+  val liz = LoginInfo("liz","test2liz","liz@gmail.com")
 
 
   val timeout = 500 millis
@@ -117,7 +127,6 @@ class SecuritySpec  extends WordSpec
 
 
     "login by name with cookies" in {
-      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
       val loginController = new TestLoginController
       loginController.register(anton)
       val sessionController = new TestSessionController
@@ -137,30 +146,18 @@ class SecuritySpec  extends WordSpec
     }
 
 
-    "authorizing actions" in {
-      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
+
+    "register" in {
       val loginController = new TestLoginController
-      loginController.register(anton)
+      //loginController.register(anton)
       val sessionController = new TestSessionController
       val logins = new Logins(loginController,sessionController)
-      Get("/users/login?email=antonkulaga@gmail.com&password=test") ~> logins.routes ~> check{
-
-      }
-    }
-
-/*
-    "check permissions" in {
-      val anton = LoginInfo("anton","test2test","antonkulaga@gmail.com")
-      val loginController = new TestLoginController
-      loginController.register(anton)
-      new Permissions()
-      val sessionController = new TestSessionController
-      val logins = new Logins(loginController,sessionController)
-      Put("/users/login?email=antonkulaga@gmail.com&password=test2test") ~> logins.routes ~> check{
+      import akka.http.scaladsl.server.Route
+       Put("/users/register?username=anton&password=test2test&email=antonkulaga@gmail.com") ~> Route.seal(
+        logins.routes) ~> check{
         val resp =  responseAs[String]
-        responseAs[String] shouldEqual "The user anton was logged in"
+        responseAs[String] shouldEqual "The user anton has been registered"
         val tokOpt = sessionController.tokenByUsername("anton")
-        println(sessionController.tokens.mkString("\n"))
         tokOpt.isDefined shouldEqual true
         val tok = tokOpt.get
         val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
@@ -170,8 +167,73 @@ class SecuritySpec  extends WordSpec
         h.pair().value shouldEqual tok
       }
     }
-*/
 
+
+
+  "register, login and logout" in {
+      val loginController = new TestLoginController
+      val sessionController = new TestSessionController
+      val logins = new Logins(loginController,sessionController)
+      import akka.http.scaladsl.server._
+
+      val routes = logins.routes
+      Put("/users/login?username=anton&password=test2test") ~>  Route.seal(routes) ~> check{
+        val resp =  responseAs[String]
+        status === StatusCodes.Forbidden
+      }
+
+    Get("/users/status") ~>  Route.seal(routes) ~> check{
+        status === StatusCodes.Forbidden
+      }
+
+    Put("/users/register?username=anton&password=test2test&email=antonkulaga@gmail.com") ~> Route.seal(routes) ~> check {
+        val resp = responseAs[String]
+        responseAs[String] shouldEqual "The user anton has been registered"
+      }
+
+    Put("/users/login?username=anton&password=test2test") ~> routes ~> check{
+      val tokOpt = sessionController.tokenByUsername("anton")
+      tokOpt.isDefined shouldEqual true
+      val tok = tokOpt.get
+      val resp =  responseAs[String]
+      responseAs[String] shouldEqual "The user anton was logged in"
+      val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
+      hop.isDefined shouldEqual(true)
+      val h = hop.get.cookie
+      h.name shouldEqual  "token"
+      h.pair().value shouldEqual tok
+    }
+
+    val tok = sessionController.tokenByUsername("anton").get
+    Get("/users/status") ~> Cookie("token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
+      responseAs[String] shouldEqual "anton"
+    }
+
+    Put("/users/logout") ~> Cookie("token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
+      responseAs[String] shouldEqual "The user was logged out"
+      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie("token", value = "deleted", expires = Some(DateTime.MinValue))))
+    }
+  }
+
+    "check permissions" in {
+      val loginController = new TestLoginController
+      val sessionController = new TestSessionController
+      import akka.http.scaladsl.server._
+      val logins= new Logins(loginController,sessionController)
+      val routes = logins.routes
+      Put("/users/register?username=anton&password=test2test&email=antonkulaga@gmail.com") ~> Route.seal(routes) ~> check {
+        val resp = responseAs[String]
+        responseAs[String] shouldEqual "The user anton has been registered"
+      }
+
+      Put("/users/login?email=antonkulaga@gmail.com&password=test2test") ~> logins.routes ~> check{
+        val resp =  responseAs[String]
+        responseAs[String] shouldEqual "The user anton was logged in"
+      }
+
+      val permission = new Permissions(sessionController)
+
+    }
 
   }
 
