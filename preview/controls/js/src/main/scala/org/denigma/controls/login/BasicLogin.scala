@@ -21,24 +21,27 @@ import org.denigma.binding.extensions._
   */
 trait BasicLogin extends BindableView
  {
-   /**
-    * Extracts name from global
-    */
-   val registeredName = Session.username //I know, that it is bad to have shared mustable state=)
 
-   val login = Var("","login")
+  def session:Session //is added to constructor
+  /**
+   * Extracts name from global
+   */
+  val registeredName:Rx[String]  = session.username //I know, that it is bad to have shared mustable state=)
+  val isSigned:Rx[Boolean] =session.currentUser.map(_.isDefined)
+
+   val username = Var("","username")
    val password = Var("","password")
    val email = Var("","email")
    val message = Var("","message")
+   val hasMessage = message.map(_.length>0)
 
-
-   val isSigned = Session.currentUser.map(_.isDefined)
    val inRegistration = Var(false)
    val inLogin = Rx(!inRegistration() && !isSigned())
 
-   val validUsername:Rx[Boolean] = login.map(l=>l.length>4 && l.length<50 && !l.contains(" ") && l!="guest")
-   val validPassword:Rx[Boolean] = password.map(p=>p.length>4 && p!=login.now)
+   val validUsername:Rx[Boolean] = username.map(l=>l.length>4 && l.length<50 && !l.contains(" ") && l!="guest")
+   val validPassword:Rx[Boolean] = password.map(p=>p.length>4 && p!=username.now)
    val canLogin = Rx{validUsername() && validPassword()}
+   val wantsLogin = Rx{ !isSigned() && inLogin() && canLogin() }
 
    val loginClick: Var[MouseEvent] = Var(Events.createMouseEvent(),"loginClick")
    val logoutClick: Var[MouseEvent] = Var(Events.createMouseEvent(),"logoutClick")

@@ -37,33 +37,25 @@ trait Registration extends BasicLogin{
     */
    val canRegister = Rx{ samePassword() && canLogin() && emailValid()}
 
+   val wantsRegistration = Rx{ canRegister() && inRegistration()}
+
+
    val toggleRegisterClick = this.signupClick.takeIf(this.inLogin)
    val toggleRegisterHandler = this.toggleRegisterClick.handler{
      this.inRegistration() = true
    }
 
-   protected def register() =  Ajax.put(
-     s"/users/register?username=${this.login.now}&password=${this.password.now}&email=${this.email.now}",
-     withCredentials = true
-   )
-
-
    val registerClick = this.signupClick.takeIfAll(this.canRegister,this.inRegistration)
    val registerHandler = this.registerClick.handler{
-     this.register().onComplete{
+     session.register(username.now,password.now,email.now) onComplete {
 
-       case Success(req) =>
-         dom.console.log("COOKIES: :\n"+dom.document.cookie)
-         println(req.getAllResponseHeaders())
-         println(req.getResponseHeader("SET-COOKIE"))
-         Session.login(login.now)
+       case Success(result)=> session.setUsername(this.username.now)
 
        case Failure(ex:AjaxException) =>
          //this.report(s"Registration failed: ${ex.xhr.responseText}")
          this.report(ex.xhr)
 
-       case _ => this.reportError("unknown failure")
-
+       case Failure(th) => this.reportError(s"unknown failure $th")
      }
    }
 

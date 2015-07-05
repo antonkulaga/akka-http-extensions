@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
   */
 trait Login extends BasicLogin{
 
-  val loginWithEmail = this.login.map(l=>l.contains('@'))
+  val loginWithEmail = this.username.map(l=>l.contains('@'))
 
    /**
     * When the user decided to switch to login
@@ -26,26 +26,13 @@ trait Login extends BasicLogin{
      this.inRegistration() = false
    }
 
-   def auth() = Ajax.put(
-     s"/users/login?${if(loginWithEmail.now) "email" else "username"}=${this.login.now}&password=${this.password.now}",
-     withCredentials = true
-   )
-
    val authClick = loginClick.takeIfAll(canLogin,inLogin)
    val authHandler = authClick.handler{
-     this.auth().onComplete{
-
-       case Success(req) =>
-         dom.console.log(dom.document.cookie)
-         Session.login(login.now)
-       //TODO: get full username
-       //Session.setUser(user)
-
-
-       case Failure(ex:AjaxException) =>
+     val auth = if(this.loginWithEmail.now) session.emailLogin(email.now,password.now) else session.usernameLogin(username.now,password.now)
+     auth.recover{
+       case ex:AjaxException =>
          //this.report(s"Authentication failed: ${ex.xhr.responseText}")
          this.report(ex.xhr)
-
 
        case _ => this.reportError("unknown failure")
      }

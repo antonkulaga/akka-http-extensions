@@ -36,10 +36,7 @@ class MenuView(val elem:HTMLElement, val params:Map[String,Any] = Map.empty) ext
 
   override type ItemView = MenuItem
 
-
-
   override val items: Rx[List[Item]] = Var(TestData.menuItems)
-
 
 }
 

@@ -55,7 +55,7 @@ trait WebJarsVersions{
 
 	val jquery =  "2.1.3"
 
-	val semanticUI = "1.12.3"
+	val semanticUI = "2.0.0"
 
 	val codemirror = "5.3"
 
