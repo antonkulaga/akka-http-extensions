@@ -1,22 +1,20 @@
-package org.denigma.preview.routes
+package akka.http.extensions
 
 import akka.http.extensions.security._
-import akka.http.scaladsl.model.headers.HttpCookie
-import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.server._
+import akka.http.scaladsl.server.{Directives, _}
 
 import scala.concurrent.Future
 
-class Registration(
+class DummyRegistration(
                     usernameLogin:(String,String)=>Future[LoginResult],
                     emailLogin:(String,String)=>Future[LoginResult],
                     register:(String,String,String)=>Future[RegistrationResult],
                     userByToken:String=>Option[LoginInfo],
                     makeToken:LoginInfo=>Future[String]
                     ) extends AuthDirectives
-with Directives
-with WithLoginRejections
-with WithRegistrationRejections
+                  with Directives
+                  with WithLoginRejections
+                  with WithRegistrationRejections
 {
   def routes: Route =
     pathPrefix("users") {
@@ -45,14 +43,13 @@ with WithRegistrationRejections
         pathPrefix("logout") {
           deleteCookie("X-Token",path="/") { c =>
             c.complete(s"The user was logged out")
-          }
-        } ~
+        }
+      } ~
         pathPrefix("status"){
           this.authenticate(userByToken){user=>
             complete(user.username)
-          }         }
+          }
+        }
     }
 }
-
-
 

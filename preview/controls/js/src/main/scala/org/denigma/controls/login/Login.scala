@@ -29,12 +29,15 @@ trait Login extends BasicLogin{
    val authClick = loginClick.takeIfAll(canLogin,inLogin)
    val authHandler = authClick.handler{
      val auth = if(this.loginWithEmail.now) session.emailLogin(email.now,password.now) else session.usernameLogin(username.now,password.now)
-     auth.recover{
-       case ex:AjaxException =>
+     auth.onComplete{
+       case Success(result)=>
+         session.setUsername(this.username.now)
+
+       case Failure(ex:AjaxException) =>
          //this.report(s"Authentication failed: ${ex.xhr.responseText}")
          this.report(ex.xhr)
 
-       case _ => this.reportError("unknown failure")
+       case Failure(th) => this.reportError(s"unknown failure $th")
      }
    }
 

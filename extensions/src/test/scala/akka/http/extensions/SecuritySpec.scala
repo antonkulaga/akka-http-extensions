@@ -9,7 +9,6 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.{HttpCookie, Cookie, `Set-Cookie`}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.denigma.preview.routes.Registration
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.mutable
@@ -67,7 +66,7 @@ trait Controllers {
       }
   }
 
-  class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends Registration(
+  class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends DummyRegistration(
       loginController.loginByName,
       loginController.loginByEmail,
       loginController.register,
@@ -140,7 +139,7 @@ class SecuritySpec  extends WordSpec
                 val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
                 hop.isDefined shouldEqual(true)
                 val h = hop.get.cookie
-                h.name shouldEqual  "token"
+                h.name shouldEqual  "X-Token"
                 h.pair().value shouldEqual tok
       }
     }
@@ -163,7 +162,7 @@ class SecuritySpec  extends WordSpec
         val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
         hop.isDefined shouldEqual(true)
         val h = hop.get.cookie
-        h.name shouldEqual  "token"
+        h.name shouldEqual   "X-Token"
         h.pair().value shouldEqual tok
       }
     }
@@ -200,18 +199,18 @@ class SecuritySpec  extends WordSpec
       val hop: Option[`Set-Cookie`] = header[`Set-Cookie`]
       hop.isDefined shouldEqual(true)
       val h = hop.get.cookie
-      h.name shouldEqual  "token"
+      h.name shouldEqual  "X-Token"
       h.pair().value shouldEqual tok
     }
 
     val tok = sessionController.tokenByUsername("anton").get
-    Get("/users/status") ~> Cookie("token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
+    Get("/users/status") ~> Cookie("X-Token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
       responseAs[String] shouldEqual "anton"
     }
 
-    Put("/users/logout") ~> Cookie("token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
+    Put("/users/logout") ~> Cookie("X-Token" -> tok) ~>  routes ~> check{ //intellij mistakenly highlights it with red
       responseAs[String] shouldEqual "The user was logged out"
-      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie("token", value = "deleted", expires = Some(DateTime.MinValue))))
+      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie("X-Token", value = "deleted", path =Some("/"), expires = Some(DateTime.MinValue))))
     }
   }
 

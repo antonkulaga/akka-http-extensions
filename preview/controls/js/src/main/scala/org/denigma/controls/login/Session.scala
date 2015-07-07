@@ -1,40 +1,43 @@
 package org.denigma.controls.login
+
 import org.denigma.binding.extensions._
 import org.scalajs.dom
 import org.scalajs.dom.XMLHttpRequest
 import org.scalajs.dom.ext.Ajax
 import rx.ops._
 import rx.{Rx, Var}
-import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.util._
 
 
-class AjaxSession extends Session
+class AjaxSession(nameByToken:String = "/users/status") extends Session
 {
-
-  private def printCookies() = {
-    dom.console.log("COOKIES ="+dom.document.cookie)
-  }
-
-  private def logCookies(fut:Future[XMLHttpRequest]) = fut map { case
-    result=>
-      printCookies()
-      dom.console.log("HEADERS = "+result.getAllResponseHeaders())
-    dom.console.log("RESPONSE = "+result.response)
-
-    result
+  this.extractCookies() match {
+    case mp => if(mp.contains("X-Token")) Ajax.get(nameByToken).onComplete{
+      case Success(req)=> setUsername(req.responseText)
+      case Failure(th)=> dom.console.log("there is not user for the token")
+    }
   }
 
 
-  override def register(username:String,password:String,email:String): Future[XMLHttpRequest] =  logCookies{
+  protected def extractCookies() = dom.document.cookie
+    .split(";")
+    .map { case str =>
+        val params = str.split("=")
+        if(params.size <2) throw new Exception("Invalid cookies") else (params.head.trim,params.tail.head.trim)
+      }.toMap[String,String]
+
+
+  override def register(username:String,password:String,email:String): Future[XMLHttpRequest] =
     Ajax.put(
       s"/users/register?username=$username&password=$password&email=$email",
       withCredentials = true
     )
-  }
 
-  override def logout(): Future[XMLHttpRequest] = logCookies{
+
+  override def logout(): Future[XMLHttpRequest] =
     Ajax.get(
       sq.h(s"users/logout"),
       withCredentials = true
@@ -42,22 +45,22 @@ class AjaxSession extends Session
       currentUser.set(None)
       result
     }
-  }
 
 
-  override def usernameLogin(username:String,password:String): Future[XMLHttpRequest] = logCookies{
+
+  override def usernameLogin(username:String,password:String): Future[XMLHttpRequest] =
     Ajax.put(
       s"/users/login?username=$username&password=$password",
       withCredentials = true
     )
-  }
 
-  override def emailLogin(email:String,password:String): Future[XMLHttpRequest] = logCookies{
+
+  override def emailLogin(email:String,password:String): Future[XMLHttpRequest] =
     Ajax.put(
       s"/users/login?email=$email&password=$password",
       withCredentials = true
     )
-  }
+
 
 }
 

@@ -1,12 +1,18 @@
 package org.denigma.controls.login
 
+import org.denigma.binding.binders.Events
 import org.denigma.binding.extensions._
 import org.denigma.binding.views.BindableView
+import org.scalajs.dom
+import org.scalajs.dom.MouseEvent
+import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.raw.HTMLElement
 import rx.Rx
+import rx.core.Var
 
 import scala.collection.immutable._
-
+import scala.util.{Failure, Success}
+import scalajs.concurrent.JSExecutionContext.Implicits.queue
 /**
  * Login view
  */

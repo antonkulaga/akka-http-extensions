@@ -1,6 +1,6 @@
 package akka.http.extensions.security
 
-import akka.http.scaladsl.model.headers.HttpCookie
+import akka.http.scaladsl.model.headers.{`Access-Control-Allow-Credentials`, `Set-Cookie`, HttpCookie}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.util.FastFuture._
 
@@ -14,7 +14,7 @@ import scala.util._
  */
 object TokenMagnet extends UserTokens with StringTokens
 
-trait UserTokens {
+trait UserTokens extends Tokens{
   type FutureUserToken = LoginInfo=>Future[String]
   type TryUserToken = LoginInfo=>Try[String]
   type UserToken = LoginInfo=>String
@@ -23,7 +23,7 @@ trait UserTokens {
     TokenMagnet(Directive[Tuple1[String]] { inner ⇒ ctx ⇒
       val (user,tokenFun) = params
         inner(Tuple1(tokenFun(user)))(ctx)
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
+      }
     )
 
 
@@ -37,7 +37,7 @@ trait UserTokens {
           .recoverWith{case th=>
           ctx.reject(ReadErrorRejection(s"cannot generate session token for ${user.username}",th))
         }
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
+      }
     )
 
 
@@ -49,13 +49,13 @@ trait UserTokens {
           case Success(t)=>  inner(Tuple1(t))(ctx)
           case Failure(th)=>  ctx.reject(ReadErrorRejection(s"cannot generate session token for ${user.username}",th))
         }
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
+      }
     )
 
 
 }
 
-trait StringTokens
+trait StringTokens extends Tokens
 {
 
   type FutureToken = String=>Future[String]
@@ -65,12 +65,12 @@ trait StringTokens
   implicit def usernameToken(params:(String,UsernameToken)): TokenMagnet  =
     TokenMagnet(Directive.apply[Tuple1[String]] { inner ⇒ ctx ⇒
         inner(Tuple1(params._2(params._1)))(ctx)
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
+      }
     )
 
 
   implicit def futureToken(params:(String,FutureToken)): TokenMagnet  =
-    TokenMagnet(Directive[Tuple1[String]] { inner ⇒ ctx ⇒
+    TokenMagnet(Directive[Tuple1[String]]  { inner ⇒ ctx ⇒
         import ctx.executionContext
         val (username,tokenFun) = params
         val future: Future[String] = tokenFun(username)
@@ -79,9 +79,7 @@ trait StringTokens
           .recoverWith{case th=>
           ctx.reject(ReadErrorRejection(s"cannot generate session token for $username",th))
         }
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
-    )
-
+      })
 
 
   implicit def tryToken(params:(String,TryToken)): TokenMagnet  =
@@ -91,9 +89,14 @@ trait StringTokens
           case Success(t)=>  inner(Tuple1(t))(ctx)
           case Failure(th)=>  ctx.reject(ReadErrorRejection(s"cannot generate session token for $username",th))
         }
-      }.flatMap(token => Directives.setCookie(HttpCookie("token",  token)))
-    )
+      })
 
 }
 
+sealed trait Tokens{
+  implicit def withTokenCookie(dir:Directive1[String]): Directive[Unit] =
+    dir.flatMap(token => Directives.setCookie(HttpCookie("X-Token", token, path = Some("/"))))
+}
 case class TokenMagnet(directive: Directive0)
+
+

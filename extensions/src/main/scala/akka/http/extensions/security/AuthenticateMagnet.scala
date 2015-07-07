@@ -49,7 +49,7 @@ sealed trait AuthenticateMagnet{
   def makeChallenge(ctx:RequestContext,realm:String = "") =  HttpChallenge(ctx.request.getUri().scheme(),realm)
 
   protected def getToken(ctx:RequestContext)= ctx.request.cookies.collectFirst{
-    case pair if pair.name=="token"=> pair.value
+    case pair if pair.name=="X-Token"=> pair.value
   }
 
 

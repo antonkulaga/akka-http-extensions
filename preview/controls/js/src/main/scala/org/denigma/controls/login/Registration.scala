@@ -49,7 +49,9 @@ trait Registration extends BasicLogin{
    val registerHandler = this.registerClick.handler{
      session.register(username.now,password.now,email.now) onComplete {
 
-       case Success(result)=> session.setUsername(this.username.now)
+       case Success(result)=>
+
+         session.setUsername(this.username.now)
 
        case Failure(ex:AjaxException) =>
          //this.report(s"Registration failed: ${ex.xhr.responseText}")
