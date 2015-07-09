@@ -12,9 +12,7 @@ object Versions extends WebJarsVersions with ScalaJSVersions with SharedVersions
 
 	val akkaHttpExtensions = "0.0.4"+"-RC4" //just to mention that it depends on akka-http RC4
 
-	val controls = "0.0.3"
-
-	val scalaTestJVM = "2.2.4"
+	val controls = "0.0.4"
 }
 
 trait ScalaJSVersions {
@@ -48,7 +46,7 @@ trait SharedVersions
 
 	val productCollections = "1.4.2"
 
-	val scalaTest = "3.0.0-M5"
+	val scalaTest = "3.0.0-M6"
 
 }
 

@@ -15,7 +15,7 @@ trait AuthDirectives {
 
   def registration(magnet:RegisterMagnet): Directive1[LoginInfo] = magnet.directive
 
-  def authorize(permission:PermissionMagnet):Directive0 = permission.directive
+  def allow(permission:PermissionMagnet):Directive0 = permission.directive
 
   def authenticate(magnet: AuthenticateMagnet): Directive1[magnet.Result] = magnet.directive
 

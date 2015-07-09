@@ -10,16 +10,28 @@
     )
   )
   @p
-    Useful directives and utils for akka-http projects.
+    This project contains useful directives and utils for akka-http projects.
+    In particular:
+    @ul
+      @li
+        registration (with bcrypted passwords)
+      @li
+        cookie-based authentication
+      @li
+        authorization
+      @li
+        P-JAX
+      @li
+        some predefined UI controls (in controls subproject)
+
   @sect{Getting started}
     @p
         Just add the library to your sbt dependencies:
     @hl.scala
         resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
-
-        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.4-RC4"
+        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.5-RC4"
     @p
-        Then you can simply extends AuthDirectives in your routes.
+        Then you can simply extend AuthDirectives in your routes.
 
   @sect{Features}
     @p
@@ -29,7 +41,7 @@
     @sect{Login/registration custom directives}
       @p
         Login/registration is common for all apps.
-        Here we provide some directives to make them easier as well encyption support (bcrypt is used to create password hashes).
+        Here we provide some directives to make them easier as well encryption support (bcrypt is used to create password hashes).
       @p
         Here how it looks like:
       @hl.scala
@@ -79,33 +91,68 @@
       @p
         PJax is a technique that makes it easier to load html pages without page reload.
         The idea is that P-JAX header is added to all your ajax requests.
-        So backend looks at the headers and loads whole template if there is not P-JAX header
-        or only a part of template if it was called for ajax.
+        So backend looks at the headers and renders the whole html page if there is no P-JAX header
+        or only a specific template if it is an AJAX request.
       @p
         In Preview backend you can see P-JAX implementation for Twirl. Here is an example of test Router with PJax directive:
       @hl.scala
         def test = pathPrefix("test"~Slash) { ctx=>
-            pjax[Twirl](Html(s"<h1>${ctx.unmatchedPath}</h1>"),loadPage){h=>c=>
+            //here is an example with Twirl template. It the request is ajax one, then we return only template
+            //if it is ordinary URL request - we render whole html page and put the template inside
+            pjax[Twirl](Html(s"Some test code<h1>${ctx.unmatchedPath}</h1>"),loadPage){h=>c=>
               val resp = HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, h.body  ))
               c.complete(resp)
             }(ctx)
           }
     @sect{Authenticate directive}
         @p
-          Basic session directive to store tokens.
+          akka-http-extensions provide cookie-based authentication where tokens are stored in a cookie.
         @hl.scala
-          pathPrefix("testtoken"){
-                    this.authenticate(userByToken){user=>
-                      complete(user.username)
+          pathPrefix("me"){
+                //here userByToken is just a function that you
+                //provide to extract LoginInfo by token value taken from the cookie
+                this.authenticate(userByToken){user=>
+                  complete(user.username)
+                }
+            }
+    @sect{Permissions}
+      @p
+        Permissions directives that allow to restrict access to some users.
+      @p
+        @i{allow} directive is used to allow access only to a group of users in some realm.
+
+      @hl.scala
+           pathPrefix("add") {
+                pathPrefix("drug") {
+                  put
+                  {
+                    parameter("name"){ name =>
+                      authenticate(sessionController.userByToken _){ user=>
+                        allow(user, AdminRealm, checkRights _)
+                        {
+                          drugs = drugs + name
+                          complete(s"drug $name added!")
+                        }
+                      }
                     }
                   }
-
+                }
+              }
     @sect{Utils and stubs}
       @p
         Some inmemory controllers for testing logging and registration
       @p
         BiMap - bidirectional map, it is missing in scala collections =(
 
+    @sect{UI controls}
+      @p
+        the github repository contains several projects. Two of them ( akka-http-extensions and binding-controls ) are published.
+        Binding-controls subproject is completely independent from akka-http-extension but provides some predefined views for things like login.
+        Add this lines to add it to your dependencies
+      @hl.scala
+        resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
+        libraryDependencies += "org.denigma" %% "binding-controls" % "0.0.4" //for JVM projects
+        libraryDependencies += "org.denigma" %%% "binding-controls" % "0.0.4" //for ScalaJS projects
 
   @sect{Running examples}
     @p

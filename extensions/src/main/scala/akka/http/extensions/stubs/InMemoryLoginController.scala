@@ -44,7 +44,9 @@ class InMemoryLoginController extends FutureLoginController {
       Future.successful(if(password.isBcrypted(user.password)) LoggedIn(user) else PasswordDoesNotMuch(email,password))
   }
 
+  def exists(user:LoginInfo) = usersByName.values.exists(_==user)
 
+  def exists(username:String) = usersByName.contains(username)
 
   def clean() =  {
     usersByName = Map.empty

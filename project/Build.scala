@@ -30,10 +30,13 @@ class PreviewBuild extends LibraryBuild
 	  .crossType(CrossType.Full)
 	  .in(file("preview/controls"))
 	  .settings(commonSettings++publishSettings: _*)
-	  .settings(version := Versions.controls)
-	  .jsSettings(libraryDependencies ++= Dependencies.sjsLibs.value++Dependencies.templates.value)
-	  .settings(name := "binding-controls")
-	  .enablePlugins(BintrayPlugin)
+	  .settings(
+			version := Versions.controls,
+			name := "binding-controls"
+		)
+		.jsSettings(libraryDependencies ++= Dependencies.sjsLibs.value++Dependencies.templates.value)
+		.jvmConfigure(p=>p.enablePlugins(SbtTwirl,SbtWeb))
+		.enablePlugins(BintrayPlugin)
 
 	lazy val controlsJVM = controls.jvm
 	lazy val controlsJS = controls.js

@@ -5,9 +5,9 @@ import sbt._
 object Dependencies {
 
 	//libs for testing
-	  lazy val testing = Def.setting(Seq(
-		//"org.scalatest" %%% "scalatest-all" % Versions.scalaTest % "test" //buggy!!!
-	  ))
+	lazy val testing = Def.setting(Seq(
+	"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test" //buggy!!!
+	))
 
 	
 	//akka-related libs
@@ -19,9 +19,8 @@ object Dependencies {
 
 		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp,
 
-		"com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaHttp,
+		"com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaHttp
 
-		"org.scalatest" %%% "scalatest" % Versions.scalaTestJVM % "test"
 	))
 
 	//akka-related libs

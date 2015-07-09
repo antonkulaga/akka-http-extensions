@@ -29,10 +29,10 @@ class InMemorySessionController extends SessionController {
   }
 
 
-
   def clean() = {
     tokens = BiMap.empty
   } //good for testing
+
   override def userByToken(token: String): Option[LoginInfo] = tokens.get(token)
 
   override def tokenByUser(user: LoginInfo): Option[String] = tokens.inverse.get(user)
