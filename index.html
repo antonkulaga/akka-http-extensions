@@ -1,0 +1,240 @@
+<!DOCTYPE html><html><head><link href="META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" /><link href="styles.css" rel="stylesheet" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><style>
+.scalatex-site-Styles-headerLink{
+  color: #777;
+  opacity: 0.05;
+  text-decoration: none;
+}
+
+
+.scalatex-site-Styles-hoverContainer:hover .scalatex-site-Styles-headerLink{
+  color: #777;
+  opacity: 0.5;
+  text-decoration: none;
+}
+.scalatex-site-Styles-hoverContainer:hover .scalatex-site-Styles-headerLink:hover{
+  opacity: 1.0;
+}
+.scalatex-site-Styles-hoverContainer:hover .scalatex-site-Styles-headerLink:active{
+  opacity: 0.75;
+}
+
+.scalatex-site-Styles-content{
+  color: #777;
+  line-height: 1.6em;
+  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+  padding: 0 1em;
+  padding-bottom: 50px;
+}
+.scalatex-site-Styles-content *{
+  position: relative;
+}
+.scalatex-site-Styles-content p{
+  text-align: justify;
+}
+.scalatex-site-Styles-content a:link{
+  color: #37a;
+  text-decoration: none;
+}
+.scalatex-site-Styles-content a:visited{
+  color: #949;
+  text-decoration: none;
+}
+.scalatex-site-Styles-content a:hover{
+  text-decoration: underline;
+}
+.scalatex-site-Styles-content a:active{
+  color: #000;
+  text-decoration: underline;
+}
+.scalatex-site-Styles-content code{
+  color: #000;
+}
+
+/*Workaround for bug in highlight.js IDEA theme*/
+span.hljs-tag, span.hljs-symbol{
+    background: none;
+}
+    </style><script src="scripts.js"></script></head><body><div>
+<div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="akka-http-extensions" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">akka-http-extensions<a class=" scalatex-site-Styles-headerLink" href="#akka-http-extensions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
+  <a href="https://github.com/denigma/akka-http-extensions" style="position: absolute;top: 0px;right: 0px;border: 0;"><img src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" /></a>
+  <p>
+    This project contains useful directives and utils for akka-http projects.
+    In particular:
+    <ul>
+      <li>
+        registration (with bcrypted passwords)</li>
+      <li>
+        cookie-based authentication</li>
+      <li>
+        authorization</li>
+      <li>
+        P-JAX</li>
+      <li>
+        some predefined UI controls (in controls subproject)
+</li></ul></p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Gettingstarted" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Getting started<a class=" scalatex-site-Styles-headerLink" href="#Gettingstarted" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+        Just add the library to your sbt dependencies:</p>
+    <pre><code class="scala scalatex-site-Styles-highlightMe">resolvers += sbt.Resolver.bintrayRepo(&quot;denigma&quot;, &quot;denigma-releases&quot;),
+libraryDependencies += &quot;org.denigma&quot; %%% &quot;akka-http-extensions&quot; % &quot;0.0.5-RC4&quot;</code></pre>
+    <p>
+        Then you can simply extend AuthDirectives in your routes.
+</p>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Features" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Features<a class=" scalatex-site-Styles-headerLink" href="#Features" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      The project was initiated because we had several akka-http projects and wanted to share the most common features and patterns.</p>
+    <p>
+      At the moment there are:</p>
+    <h1 id="Login/registrationcustomdirectives" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Login/registrationcustomdirectives" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Login/registration custom directives</h1>
+      <p>
+        Login/registration is common for all apps.
+        Here we provide some directives to make them easier as well encryption support (bcrypt is used to create password hashes).</p>
+      <p>
+        Here how it looks like:</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">class Registration(
+                    usernameLogin:(String,String)=&gt;Future[LoginResult],
+                    emailLogin:(String,String)=&gt;Future[LoginResult],
+                    register:(String,String,String)=&gt;Future[RegistrationResult],
+                    userByToken:String=&gt;Option[LoginInfo],
+                    makeToken:LoginInfo=&gt;Future[String]
+                    ) extends AuthDirectives
+                  with Directives
+                  with WithLoginRejections
+                  with WithRegistrationRejections
+{
+  def routes: Route =
+    pathPrefix(&quot;users&quot;) {
+      pathPrefix(&quot;login&quot;) {
+        put {
+          handleRejections(loginRejectionHandlers) {
+            login(usernameLogin, emailLogin) { user =&gt;
+              startSession(user, makeToken) {
+                complete(s&quot;The user ${user.username} was logged in&quot;)
+              }
+            }
+          }
+        }
+      } ~
+        pathPrefix(&quot;register&quot;) {
+          put {
+            handleRejections(registerRejectionHandlers) {
+              registration(register) { user =&gt;
+                startSession(user, makeToken) {
+                  complete(s&quot;The user ${user.username} has been registered&quot;)
+                }
+              }
+            }
+          }
+        } ~
+        pathPrefix(&quot;logout&quot;) {
+          deleteCookie(&quot;token&quot;) { c =&gt;
+            c.complete(s&quot;The user was logged out&quot;)
+        }
+      }
+    }
+}</code></pre>
+    <h1 id="Pjaxsupport" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Pjaxsupport" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Pjax support</h1>
+      <p>
+        PJax is a technique that makes it easier to load html pages without page reload.
+        The idea is that P-JAX header is added to all your ajax requests.
+        So backend looks at the headers and renders the whole html page if there is no P-JAX header
+        or only a specific template if it is an AJAX request.</p>
+      <p>
+        In Preview backend you can see P-JAX implementation for Twirl. Here is an example of test Router with PJax directive:</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">def test = pathPrefix(&quot;test&quot;~Slash) { ctx=&gt;
+    //here is an example with Twirl template. It the request is ajax one, then we return only template
+    //if it is ordinary URL request - we render whole html page and put the template inside
+    pjax[Twirl](Html(s&quot;Some test code&lt;h1&gt;${ctx.unmatchedPath}&lt;/h1&gt;&quot;),loadPage){h=&gt;c=&gt;
+      val resp = HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, h.body  ))
+      c.complete(resp)
+    }(ctx)
+  }</code></pre>
+    <h1 id="Authenticatedirective" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Authenticatedirective" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Authenticate directive</h1>
+        <p>
+          akka-http-extensions provide cookie-based authentication where tokens are stored in a cookie.</p>
+        <pre><code class="scala scalatex-site-Styles-highlightMe">pathPrefix(&quot;me&quot;){
+      //here userByToken is just a function that you
+      //provide to extract LoginInfo by token value taken from the cookie
+      this.authenticate(userByToken){user=&gt;
+        complete(user.username)
+      }
+  }</code></pre>
+    <h1 id="Permissions" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Permissions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Permissions</h1>
+      <p>
+        Permissions directives that allow to restrict access to some users.</p>
+      <p>
+        <i>allow</i> directive is used to allow access only to a group of users in some realm.
+</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">pathPrefix(&quot;add&quot;) {
+     pathPrefix(&quot;drug&quot;) {
+       put
+       {
+         parameter(&quot;name&quot;){ name =&gt;
+           authenticate(sessionController.userByToken _){ user=&gt;
+             allow(user, AdminRealm, checkRights _)
+             {
+               drugs = drugs + name
+               complete(s&quot;drug $name added!&quot;)
+             }
+           }
+         }
+       }
+     }
+   }</code></pre>
+    <h1 id="Utilsandstubs" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Utilsandstubs" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Utils and stubs</h1>
+      <p>
+        Some inmemory controllers for testing logging and registration</p>
+      <p>
+        BiMap - bidirectional map, it is missing in scala collections =(
+</p>
+    <h1 id="UIcontrols" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#UIcontrols" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>UI controls</h1>
+      <p>
+        the github repository contains several projects. Two of them ( akka-http-extensions and binding-controls ) are published.
+        Binding-controls subproject is completely independent from akka-http-extension but provides some predefined views for things like login.
+        Add this lines to add it to your dependencies</p>
+      <pre><code class="scala scalatex-site-Styles-highlightMe">resolvers += sbt.Resolver.bintrayRepo(&quot;denigma&quot;, &quot;denigma-releases&quot;),
+libraryDependencies += &quot;org.denigma&quot; %% &quot;binding-controls&quot; % &quot;0.0.4&quot; //for JVM projects
+libraryDependencies += &quot;org.denigma&quot; %%% &quot;binding-controls&quot; % &quot;0.0.4&quot; //for ScalaJS projects
+</code></pre>
+  <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Runningexamples" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Running examples<a class=" scalatex-site-Styles-headerLink" href="#Runningexamples" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
+    <p>
+      This git repository contains some useful classes and directives for akka-http.
+      akka.http.extensions are located in extensions subprojects. All other code is for previews.
+</p>
+    <p>
+      The project contains 4 subprojects::
+      <ul>
+        <li>
+          extensions - the library itself, it is the artifact that is published</li>
+        <li>
+          preview/backend - scala backend example + tests</li>
+        <li>
+          preview/controls -  some shared between backend and frontend of the preview example</li>
+        <li>
+          preview/frontend - ScalaJS frontend for the example
+</li></ul></p>
+    <p>
+      To run the project you must have SBT ( http://www.scala-sbt.org/ ) installed.
+</p>
+    <p>
+      To run project:
+      <pre><code class="bash scalatex-site-Styles-highlightMe">sbt //to opens sbt console
+re-start //Use this command **instead of** run to run the app
+Open localhost:1234 to see the result, it should reload whenever any sources are change
+</code></pre></p></div>
+</div><script>
+    scalatex.scrollspy.Controller().main(
+      [{"value":"akka-http-extensions","children":[{"value":"Getting started","children":[]},{"value":"Features","children":[{"value":"Login/registration custom directives","children":[]},{"value":"Pjax support","children":[]},{"value":"Authenticate directive","children":[]},{"value":"Permissions","children":[]},{"value":"Utils and stubs","children":[]},{"value":"UI controls","children":[]}]},{"value":"Running examples","children":[]}]}]
+  )</script><script>
+    ['DOMContentLoaded', 'load'].forEach(function(ev){
+      addEventListener(ev, function(){
+        Array.prototype.forEach.call(
+          document.getElementsByClassName('scalatex-site-Styles-highlightMe'),
+          hljs.highlightBlock
+        );
+      })
+    })
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
