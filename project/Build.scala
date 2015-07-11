@@ -1,6 +1,7 @@
 import com.typesafe.sbt.SbtNativePackager.autoImport._
 import com.typesafe.sbt.web.SbtWeb
 import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
@@ -34,8 +35,14 @@ class PreviewBuild extends LibraryBuild
 			version := Versions.controls,
 			name := "binding-controls"
 		)
-		.jsSettings(libraryDependencies ++= Dependencies.sjsLibs.value++Dependencies.templates.value)
-		.jvmConfigure(p=>p.enablePlugins(SbtTwirl,SbtWeb))
+		.jvmSettings(
+			libraryDependencies ++= Dependencies.webjars.value
+		)
+		.jsSettings(
+			libraryDependencies ++= Dependencies.sjsLibs.value,
+			jsDependencies += RuntimeDOM % "test"
+		)
+		.jvmConfigure(p=>p.enablePlugins(SbtTwirl,SbtWeb).dependsOn(extensions))
 		.enablePlugins(BintrayPlugin)
 
 	lazy val controlsJVM = controls.jvm
@@ -50,10 +57,9 @@ class PreviewBuild extends LibraryBuild
 		jsDependencies += RuntimeDOM % "test"
 	).enablePlugins(ScalaJSPlugin).dependsOn(controlsJS)
 
-	//backend project for preview and testing
+	//backend project for preview uhand testing
 	lazy val backend = Project("backend", file("preview/backend"),settings = commonSettings++Revolver.settings)
 		.settings(
-			libraryDependencies ++= Dependencies.templates.value++Dependencies.webjars.value,
 				mainClass in Compile :=Some("org.denigma.preview.Main"),
         mainClass in Revolver.reStart := Some("org.denigma.preview.Main"),
         resourceGenerators in Compile <+=  (fastOptJS in Compile in frontend,
@@ -102,7 +108,7 @@ class LibraryBuild  extends sbt.Build{
 		scalaVersion := Versions.scala,
 		organization := "org.denigma",
 		resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"), //for scala-js-binding
-		libraryDependencies ++= Dependencies.commonShared.value++Dependencies.testing.value,
+		libraryDependencies ++= Dependencies.shared.value ++ Dependencies.testing.value,
 		updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 	)
 

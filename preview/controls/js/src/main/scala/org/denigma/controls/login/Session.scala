@@ -14,20 +14,13 @@ import scala.util._
 
 class AjaxSession(nameByToken:String = "/users/status") extends Session
 {
-  this.extractCookies() match {
-    case mp => if(mp.contains("X-Token")) Ajax.get(nameByToken).onComplete{
-      case Success(req)=> setUsername(req.responseText)
-      case Failure(th)=> dom.console.log("there is not user for the token")
-    }
-  }
-
-
-  protected def extractCookies() = dom.document.cookie
+  protected def extractCookies():Map[String, String] = dom.document.cookie
     .split(";")
-    .map { case str =>
-        val params = str.split("=")
-        if(params.size <2) throw new Exception("Invalid cookies") else (params.head.trim,params.tail.head.trim)
-      }.toMap[String,String]
+    .collect { case pair if pair.contains("=") && pair.length>2 =>
+      pair.split("=") match {
+        case  couple=> (couple.head.trim,couple.tail.head.trim)
+      }
+    }.toMap[String,String]
 
 
   override def register(username:String,password:String,email:String): Future[XMLHttpRequest] =
@@ -67,6 +60,7 @@ class AjaxSession(nameByToken:String = "/users/status") extends Session
 trait Session {
 
    val currentUser:Var[Option[String]]= Var(None)
+
    val userChange: Rx[(Option[String], Option[String])] = currentUser.unique().zip()
 
    def register(username:String,password:String,email:String):Future[_]

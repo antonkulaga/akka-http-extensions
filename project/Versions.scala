@@ -10,9 +10,9 @@ object Versions extends WebJarsVersions with ScalaJSVersions with SharedVersions
 
 	val apacheCodec = "1.10"
 
-	val akkaHttpExtensions = "0.0.4"+"-RC4" //just to mention that it depends on akka-http RC4
+	val akkaHttpExtensions = "0.0.5-1"+"-RC4" //just to mention that it depends on akka-http RC4
 
-	val controls = "0.0.4"
+	val controls = "0.0.5"
 }
 
 trait ScalaJSVersions {

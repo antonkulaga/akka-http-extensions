@@ -30,12 +30,6 @@ object Dependencies {
 		"commons-codec" % "commons-codec" % Versions.apacheCodec
 	))
 
-	lazy val templates = Def.setting(Seq(
-		"com.github.japgolly.scalacss" %%% "core" % Versions.scalaCSS,
-
-		"com.github.japgolly.scalacss" %%% "ext-scalatags" %  Versions.scalaCSS
-	))
-
 
 	//scalajs libs
 	lazy val sjsLibs= Def.setting(Seq(
@@ -61,7 +55,9 @@ object Dependencies {
 	))
 
 	//common purpose libs
-	lazy val commonShared: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
-		//"com.softwaremill.quicklens" %%% "quicklens" % Versions.quicklens//, //nice lenses for case classes
+	lazy val shared: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq(
+		"com.github.japgolly.scalacss" %%% "core" % Versions.scalaCSS,
+
+		"com.github.japgolly.scalacss" %%% "ext-scalatags" %  Versions.scalaCSS
 	))
 }

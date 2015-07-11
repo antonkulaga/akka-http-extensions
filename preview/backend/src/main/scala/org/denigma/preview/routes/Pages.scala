@@ -3,6 +3,7 @@ package org.denigma.preview.routes
 import akka.http.extensions.pjax.PJax
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives
+import org.denigma.controls.Twirl
 import play.twirl.api.Html
 
 class Pages extends Directives with PJax{

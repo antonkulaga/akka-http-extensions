@@ -1,6 +1,6 @@
-package org.denigma.preview.routes
+package org.denigma.controls
 
-import akka.http.extensions.pjax.{TemplateEngine, PJaxMagnet}
+import akka.http.extensions.pjax.{PJaxMagnet, TemplateEngine}
 import akka.http.scaladsl.server.Directive
 
 /**
