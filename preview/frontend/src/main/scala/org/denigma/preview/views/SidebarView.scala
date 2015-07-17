@@ -10,6 +10,7 @@ import org.querki.jquery._
 import scala.scalajs.js
 import org.denigma.binding.extensions._
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.semantic.ui._
 /**
  * View for the sitebar
  */
@@ -21,7 +22,7 @@ class SidebarView (val elem:HTMLElement,val params:Map[String,Any] = Map.empty[S
 
   override def bindElement(el:HTMLElement) = {
     super.bindElement(el)
-    $(".ui.accordion").dyn.accordion()
+    $(".ui.accordion").accordion()
   }
 
   override protected def attachBinders(): Unit =  binders =  BindableView.defaultBinders(this)

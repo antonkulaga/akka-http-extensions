@@ -29,7 +29,7 @@
         Just add the library to your sbt dependencies:
     @hl.scala
         resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
-        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.5-RC4"
+        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.5"
     @p
         Then you can simply extend AuthDirectives in your routes.
 
@@ -45,48 +45,53 @@
       @p
         Here how it looks like:
       @hl.scala
-        class Registration(
-                            usernameLogin:(String,String)=>Future[LoginResult],
-                            emailLogin:(String,String)=>Future[LoginResult],
-                            register:(String,String,String)=>Future[RegistrationResult],
-                            userByToken:String=>Option[LoginInfo],
-                            makeToken:LoginInfo=>Future[String]
-                            ) extends AuthDirectives
-                          with Directives
-                          with WithLoginRejections
-                          with WithRegistrationRejections
-        {
-          def routes: Route =
-            pathPrefix("users") {
-              pathPrefix("login") {
-                put {
-                  handleRejections(loginRejectionHandlers) {
-                    login(usernameLogin, emailLogin) { user =>
-                      startSession(user, makeToken) {
-                        complete(s"The user ${user.username} was logged in")
-                      }
-                    }
-                  }
-                }
-              } ~
-                pathPrefix("register") {
-                  put {
-                    handleRejections(registerRejectionHandlers) {
-                      registration(register) { user =>
-                        startSession(user, makeToken) {
-                          complete(s"The user ${user.username} has been registered")
-                        }
-                      }
-                    }
-                  }
-                } ~
-                pathPrefix("logout") {
-                  deleteCookie("token") { c =>
-                    c.complete(s"The user was logged out")
-                }
-              }
-            }
-        }
+       class Registration(
+                           usernameLogin:(String,String)=>Future[LoginResult],
+                           emailLogin:(String,String)=>Future[LoginResult],
+                           register:(String,String,String)=>Future[RegistrationResult],
+                           userByToken:String=>Option[LoginInfo],
+                           makeToken:LoginInfo=>Future[String]
+                           ) extends AuthDirectives
+       with Directives
+       with WithLoginRejections
+       with WithRegistrationRejections
+       {
+         def routes: Route =
+           pathPrefix("users") {
+             pathPrefix("login") {
+               put {
+                 handleRejections(loginRejectionHandlers) {
+                   login(usernameLogin, emailLogin) { user =>
+                     startSession(user, makeToken) {
+                       complete(s"The user ${user.username} was logged in")
+                     }
+                   }
+                 }
+               }
+             } ~
+               pathPrefix("register") {
+                 put {
+                   handleRejections(registerRejectionHandlers) {
+                     registration(register) { user =>
+                       startSession(user, makeToken) {
+                         complete(s"The user ${user.username} has been registered")
+                       }
+                     }
+                   }
+                 }
+               } ~
+               pathPrefix("logout") {
+                 logout{ c =>
+                   c.complete(s"The user was logged out")
+                 }
+               } ~
+               pathPrefix("status"){
+                 this.authenticate(userByToken){user=>
+                   complete(user.username)
+                 }
+               }
+           }
+       }
     @sect{Pjax support}
       @p
         PJax is a technique that makes it easier to load html pages without page reload.

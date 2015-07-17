@@ -17,9 +17,9 @@ object Build extends PreviewBuild {
 
 	lazy val root = Project("root",file("."),settings = commonSettings)
 		.settings(
-			mainClass in Compile := (mainClass in backend in Compile).value,
-      libraryDependencies += "com.lihaoyi" % "ammonite-repl_2.11.6" %  Versions.ammonite,
-			initialCommands in console := """ammonite.repl.Repl.run("")""" //better console
+			mainClass in Compile := (mainClass in backend in Compile).value
+      //libraryDependencies += "com.lihaoyi" % "ammonite-repl_2.11.6" %  Versions.ammonite,
+			//initialCommands in console := """ammonite.repl.Repl.run("")""" //better console
 		) dependsOn backend aggregate(backend,frontend)
 }
 

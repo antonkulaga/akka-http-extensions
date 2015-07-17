@@ -1,7 +1,7 @@
 package akka.http.extensions
 
 import akka.http.extensions.security._
-import akka.http.extensions.stubs.{InMemoryLoginController, InMemorySessionController}
+import akka.http.extensions.stubs.{Registration, InMemoryLoginController, InMemorySessionController}
 import com.github.t3hnar.bcrypt._
 
 import scala.concurrent.Future
@@ -21,7 +21,7 @@ trait RegistrationControllers {
 
   class TestSessionController extends InMemorySessionController
 
-  class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends DummyRegistration(
+  class Logins(loginController: TestLoginController,sessionController: TestSessionController) extends Registration(
       loginController.loginByName,
       loginController.loginByEmail,
       loginController.register,

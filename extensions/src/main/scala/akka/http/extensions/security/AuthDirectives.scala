@@ -13,6 +13,8 @@ trait AuthDirectives {
 
   def login(magnet: LoginMagnet): Directive1[LoginInfo] = magnet.directive
 
+  def logout: Directive0 = Directives.deleteCookie("X-Token",path="/")
+
   def registration(magnet:RegisterMagnet): Directive1[LoginInfo] = magnet.directive
 
   def allow(permission:PermissionMagnet):Directive0 = permission.directive

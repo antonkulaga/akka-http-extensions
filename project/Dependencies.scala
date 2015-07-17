@@ -6,7 +6,7 @@ object Dependencies {
 
 	//libs for testing
 	lazy val testing = Def.setting(Seq(
-	"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test" //buggy!!!
+		"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
 	))
 
 	
@@ -37,9 +37,9 @@ object Dependencies {
 
 		"org.querki" %%% "jquery-facade" % Versions.jqueryFacade, //scalajs facade for jQuery + jQuery extensions
 
-		"org.querki" %%% "querki-jsext" % Versions.jsext, //useful sclalajs extensions
-
 		"org.denigma" %%% "codemirror-facade" % Versions.codemirrorFacade,
+
+		"org.denigma" %%% "semantic-ui-facade" % Versions.semanticUIFacade,
 
 		"org.denigma" %%% "binding" % Versions.binding
 	))
