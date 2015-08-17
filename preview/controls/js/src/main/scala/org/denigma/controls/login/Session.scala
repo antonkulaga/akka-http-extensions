@@ -39,21 +39,17 @@ class AjaxSession(nameByToken:String = "/users/status") extends Session
       result
     }
 
-
-
   override def usernameLogin(username:String,password:String): Future[XMLHttpRequest] =
     Ajax.put(
       s"/users/login?username=$username&password=$password",
       withCredentials = true
     )
 
-
   override def emailLogin(email:String,password:String): Future[XMLHttpRequest] =
     Ajax.put(
       s"/users/login?email=$email&password=$password",
       withCredentials = true
     )
-
 
 }
 

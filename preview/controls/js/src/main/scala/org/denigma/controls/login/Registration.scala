@@ -25,7 +25,6 @@ trait Registration extends BasicLogin{
     */
    def isValidEmail(email: String): Boolean = """(\w+)@([\w\.]+)""".r.unapplySeq(email).isDefined
 
-
    /**
     * True if password and repeatpassword match
     */

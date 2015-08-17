@@ -1,30 +1,35 @@
-import com.typesafe.sbt.SbtNativePackager.autoImport._
-import com.typesafe.sbt.web.SbtWeb
-import org.scalajs.sbtplugin.ScalaJSPlugin
-import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport._
+import bintray._
+import bintray.BintrayPlugin.autoImport._
+import com.typesafe.sbt.gzip.Import._
+import com.typesafe.sbt.web.SbtWeb.autoImport._
+import com.typesafe.sbt.web._
+import com.typesafe.sbt.web.pipeline.Pipeline
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import play.twirl.sbt._
+import playscalajs.PlayScalaJS.autoImport._
+import playscalajs.ScalaJSPlay.autoImport._
+import playscalajs.{PlayScalaJS, ScalaJSPlay}
 import sbt.Keys._
 import sbt._
-import bintray._
-import BintrayPlugin.autoImport._
 import spray.revolver.RevolverPlugin._
-import play.twirl.sbt._
-import play.twirl.sbt.SbtTwirl.autoImport._
-import com.typesafe.sbt.web.SbtWeb.autoImport._
-import scalatex.ScalatexReadme
 
 object Build extends PreviewBuild {
 
 	lazy val root = Project("root",file("."),settings = commonSettings)
 		.settings(
 			mainClass in Compile := (mainClass in backend in Compile).value
-      //libraryDependencies += "com.lihaoyi" % "ammonite-repl_2.11.6" %  Versions.ammonite,
-			//initialCommands in console := """ammonite.repl.Repl.run("")""" //better console
 		) dependsOn backend aggregate(backend,frontend)
 }
 
 class PreviewBuild extends LibraryBuild
 {
+
+	val scalaJSDevStage  = Def.taskKey[Pipeline.Stage]("Apply fastOptJS on all Scala.js projects")
+
+	def scalaJSDevTaskStage: Def.Initialize[Task[Pipeline.Stage]] = Def.task { mappings: Seq[PathMapping] =>
+		mappings ++ PlayScalaJS.devFiles(Compile).value ++ PlayScalaJS.sourcemapScalaFiles(fastOptJS).value
+	}
+
 
 	// some useful UI controls + shared code
 	lazy val controls = crossProject
@@ -54,19 +59,22 @@ class PreviewBuild extends LibraryBuild
 		.settings(
 		persistLauncher in Compile := true,
 		persistLauncher in Test := false,
-		jsDependencies += RuntimeDOM % "test"
-	).enablePlugins(ScalaJSPlugin).dependsOn(controlsJS)
+		jsDependencies += RuntimeDOM % "test",
+		sourceMapsDirectories :=Seq( (baseDirectory in controlsJS).value )
+		).enablePlugins(ScalaJSPlay).dependsOn(controlsJS)
 
 	//backend project for preview uhand testing
 	lazy val backend = Project("backend", file("preview/backend"),settings = commonSettings++Revolver.settings)
 		.settings(
 				mainClass in Compile :=Some("org.denigma.preview.Main"),
         mainClass in Revolver.reStart := Some("org.denigma.preview.Main"),
-        resourceGenerators in Compile <+=  (fastOptJS in Compile in frontend,
-				  packageScalaJSLauncher in Compile in frontend) map( (f1, f2) => Seq(f1.data, f2.data)),
-			watchSources <++= (watchSources in frontend),
-      (managedClasspath in Runtime) += (packageBin in Assets).value
-		).enablePlugins(SbtTwirl,SbtWeb).dependsOn(controlsJVM,extensions).aggregate(extensions)
+				scalaJSDevStage := scalaJSDevTaskStage.value,
+				//pipelineStages := Seq(scalaJSProd,gzip),
+				(emitSourceMaps in fullOptJS) := true,
+				pipelineStages in Assets := Seq(scalaJSDevStage,gzip), //for run configuration
+				(managedClasspath in Runtime) += (packageBin in Assets).value, //to package production deps
+				scalaJSProjects := Seq(frontend)
+		).enablePlugins(SbtTwirl,SbtWeb,PlayScalaJS).dependsOn(controlsJVM,extensions).aggregate(extensions)
 
 	/** Scalatex banana-rdf website, see http://lihaoyi.github.io/Scalatex/#QuickStart */
 	lazy val readme = scalatex.ScalatexReadme(
@@ -117,7 +125,9 @@ class LibraryBuild  extends sbt.Build{
 		.settings(
 			name := "akka-http-extensions",
 			version := Versions.akkaHttpExtensions,
-			libraryDependencies ++= Dependencies.akka.value ++ Dependencies.otherJVM.value
+			libraryDependencies ++= Dependencies.akka.value ++ Dependencies.otherJVM.value,
+			libraryDependencies += "com.lihaoyi" % "ammonite-repl" % "0.4.5" cross CrossVersion.full,
+			initialCommands in console := """ammonite.repl.Repl.run("")""" //better console
 		).enablePlugins(BintrayPlugin)
 
 }

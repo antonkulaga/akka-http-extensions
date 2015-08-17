@@ -37,9 +37,6 @@ class LoginView(val elem:HTMLElement, val session:Session, val params:Map[String
     message()=""
   }
 
-  override def activateMacro(): Unit = { extractors.foreach(_.extractEverything(this))}
-
-  override protected def attachBinders(): Unit = this.withBinders(BindableView.defaultBinders(this))
 }
 
 
