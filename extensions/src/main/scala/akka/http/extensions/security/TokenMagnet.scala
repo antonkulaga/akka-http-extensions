@@ -15,9 +15,9 @@ import scala.util._
 object TokenMagnet extends UserTokens with StringTokens
 
 trait UserTokens extends Tokens{
-  type FutureUserToken = LoginInfo=>Future[String]
-  type TryUserToken = LoginInfo=>Try[String]
-  type UserToken = LoginInfo=>String
+  type FutureUserToken = LoginInfo => Future[String]
+  type TryUserToken = LoginInfo => Try[String]
+  type UserToken = LoginInfo => String
 
   implicit def userToken(params:(LoginInfo,UserToken)): TokenMagnet  =
     TokenMagnet(Directive[Tuple1[String]] { inner ⇒ ctx ⇒

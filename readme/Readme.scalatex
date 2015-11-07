@@ -29,7 +29,7 @@
         Just add the library to your sbt dependencies:
     @hl.scala
         resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
-        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.5"
+        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.6"
     @p
         Then you can simply extend AuthDirectives in your routes.
 

@@ -2,7 +2,7 @@ package akka.http.extensions.pjax
 
 import akka.http.scaladsl.server.{Directive1, Directive}
 
-case class PJaxMagnet[Template<:TemplateEngine](directive:Directive1[Template#Html])
+case class PJaxMagnet[Template<:TemplateEngine](directive: Directive1[Template#Html])
 
 trait TemplateEngine{
   type Html

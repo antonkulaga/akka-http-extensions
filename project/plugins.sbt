@@ -10,9 +10,9 @@ addSbtPlugin("com.gilt" % "sbt-dependency-graph-sugar" % "0.7.5-1") //visual dep
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
-addSbtPlugin("com.lihaoyi" % "scalatex-sbt-plugin" % "0.3.1") //for documentation
+addSbtPlugin("com.lihaoyi" % "scalatex-sbt-plugin" % "0.3.3")
 
-addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.2.7") //scalajs sbt-web support
+addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.2.8") //scalajs sbt-web support
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
