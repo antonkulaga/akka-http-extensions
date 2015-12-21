@@ -11,7 +11,7 @@ import akka.http.scaladsl.model.headers.{HttpCookie, Cookie, `Set-Cookie`}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{WordSpec}
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._

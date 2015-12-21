@@ -2,8 +2,8 @@ package akka.http.extensions
 
 import akka.http.extensions.utils.BiMap
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
-class UtilsSpec extends WordSpec with Matchers with ScalaFutures
+import org.scalatest._
+class UtilsSpec extends WordSpec with ScalaFutures with Matchers
 {
 
   "bimap" should {
@@ -11,7 +11,7 @@ class UtilsSpec extends WordSpec with Matchers with ScalaFutures
     val mp =  BiMap(1->"one",2->"two",3->"three")
 
     "be identical" in {
-      mp(1) shouldEqual("one")
+      mp(1) should equal("one")
       mp.inverse("one") shouldEqual 1
 
     }

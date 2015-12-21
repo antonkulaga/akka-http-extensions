@@ -25,6 +25,7 @@ class MainActor  extends Actor with ActorLogging // Routes
     case AppMessages.Start(config)=>
       val (host,port) = (config.getString("app.host") , config.getInt("app.port"))
       server.bindAndHandle(router.routes, host, port)
+      log.info(s"starting server at $host:$port")
 
     case AppMessages.Stop=> onStop()
   }

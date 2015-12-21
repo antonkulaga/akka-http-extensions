@@ -21,13 +21,13 @@ object TestData{
  * @param elem html element
  * @param params view params (if any)
  */
-class MenuView(val elem:Element, val params:Map[String,Any] = Map.empty) extends ItemsSeqView
+class MenuView(val elem: Element, val params: Map[String,Any] = Map.empty) extends ItemsSeqView
 {
 
   override type Item = String
 
 
-  override def newItem(item: Item) = this.constructItemView(item){ case (el,mp)=> //TODO: rename constructItem to smt like ConstructItemView
+  override def newItemView(item: Item) = this.constructItemView(item){ case (el,mp)=> //TODO: rename constructItem to smt like ConstructItemView
     new MenuItem(el,item,mp).withBinders(i=>List(new GeneralBinder(i),new NavigationBinder(i)))
   }
 
@@ -37,7 +37,7 @@ class MenuView(val elem:Element, val params:Map[String,Any] = Map.empty) extends
 
 }
 
-class MenuItem(val elem:Element,value:String, val params:Map[String,Any] = Map.empty) extends BindableView{
+class MenuItem(val elem: Element, value: String, val params: Map[String, Any] = Map.empty) extends BindableView{
 
   val label: Var[String] = Var(value)
   val uri: Rx[String] = label.map(l=>TestData.prefix+l.replace(" ","_"))

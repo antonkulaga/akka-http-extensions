@@ -9,10 +9,10 @@ import rx._
 /**
  * View for the sitebar
  */
-class SidebarView (val elem:Element,val params:Map[String,Any] = Map.empty[String,Any]) extends BindableView with WithDomain{
+class SidebarView (val elem: Element, val params: Map[String, Any] = Map.empty[String, Any]) extends BindableView with WithDomain{
   val logo = Var("/resources/logo.jpg")
 
-  override def bindElement(el:Element) = {
+  override def bindElement(el: Element) = {
     super.bindElement(el)
     $(".ui.accordion").accordion()
   }

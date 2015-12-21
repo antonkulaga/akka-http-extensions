@@ -5,10 +5,11 @@ object Dependencies {
 
 	//libs for testing
 	lazy val testing = Def.setting(Seq(
-		"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+		"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test",
+		"org.scalatest" %%% "scalatest-matchers" % Versions.scalaTest % "test"
 	))
 
-	
+
 	//akka-related libs
 	lazy val akka = Def.setting(Seq(
 
@@ -46,7 +47,9 @@ object Dependencies {
 
 		"org.webjars" % "Semantic-UI" % Versions.semanticUI, //css theme, similar to bootstrap
 
-		"org.webjars" % "codemirror" % Versions.codemirror
+		"org.webjars" % "codemirror" % Versions.codemirror,
+
+		"org.webjars" % "jquery" % Versions.jquery
 	))
 
 	lazy val commonShared: Def.Initialize[Seq[ModuleID]] = Def.setting(Seq.empty)

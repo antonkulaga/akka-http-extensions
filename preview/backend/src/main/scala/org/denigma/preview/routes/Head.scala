@@ -17,7 +17,7 @@ class Head extends Directives
       HttpResponse(  entity = HttpEntity(MediaTypes.`text/css`,  MyStyles.render   ))   }
   }
 
-  def loadResources = pathPrefix(resourcePrefix~Slash) {
+  def loadResources = pathPrefix(resourcePrefix ~ Slash) {
     getFromResourceDirectory("")
   }
 

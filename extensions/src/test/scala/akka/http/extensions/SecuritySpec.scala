@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.headers.{Cookie, HttpCookie, `Set-Cookie`}
 import akka.http.scaladsl.model.{DateTime, StatusCodes}
 
 
-class SecuritySpec  extends ExtensionsTestBase with RegistrationControllers{
+class SecuritySpec extends ExtensionsTestBase with RegistrationControllers{
 
 
   "application with registration" should {
