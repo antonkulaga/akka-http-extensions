@@ -10,7 +10,7 @@
     )
   )
   @p
-    This project contains useful directives and utils for akka-http projects.
+    This project contains useful directives and utils for akka-http 2.x projects.
     In particular:
     @ul
       @li
@@ -29,7 +29,7 @@
         Just add the library to your sbt dependencies:
     @hl.scala
         resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
-        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.6"
+        libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.9"
     @p
         Then you can simply extend AuthDirectives in your routes.
 
@@ -148,16 +148,6 @@
         Some inmemory controllers for testing logging and registration
       @p
         BiMap - bidirectional map, it is missing in scala collections =(
-
-    @sect{UI controls}
-      @p
-        the github repository contains several projects. Two of them ( akka-http-extensions and binding-controls ) are published.
-        Binding-controls subproject is completely independent from akka-http-extension but provides some predefined views for things like login.
-        Add this lines to add it to your dependencies
-      @hl.scala
-        resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"),
-        libraryDependencies += "org.denigma" %% "binding-controls" % "0.0.4" //for JVM projects
-        libraryDependencies += "org.denigma" %%% "binding-controls" % "0.0.4" //for ScalaJS projects
 
   @sect{Running examples}
     @p

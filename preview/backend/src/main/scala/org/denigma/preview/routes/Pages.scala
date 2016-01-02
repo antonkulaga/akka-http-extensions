@@ -15,7 +15,7 @@ class Pages extends Directives with PJax{
   def index =  pathSingleSlash{ctx=>
     ctx.materializer.executionContext
     ctx.complete {
-      HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, html.index(defaultPage).body  ))
+      HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`.withCharset(HttpCharsets.`UTF-8`), html.index(defaultPage).body  ))
     }
   }
 
@@ -24,7 +24,7 @@ class Pages extends Directives with PJax{
 
   def test = pathPrefix("test"~Slash) { ctx=>
       pjax[Twirl](Html(s"<h1>${ctx.unmatchedPath}</h1>"),loadPage){h=>c=>
-        val resp = HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`, h.body  ))
+        val resp = HttpResponse(  entity = HttpEntity(MediaTypes.`text/html`.withCharset(HttpCharsets.`UTF-8`), h.body  ))
         c.complete(resp)
       }(ctx)
     }
