@@ -1,7 +1,7 @@
 package org.denigma.preview.views.stubs
 
 import org.scalajs.dom
-import rx.core.Var
+import rx.Var
 
 trait WithDomain {
 

@@ -4,8 +4,9 @@ import org.denigma.binding.binders.{NavigationBinder, GeneralBinder}
 import org.denigma.binding.views._
 import org.scalajs.dom.raw.Element
 import rx.Rx
-import rx.core.Var
-import rx.ops._
+import rx.Var
+import rx._
+import rx.Ctx.Owner.Unsafe.Unsafe
 
 import scala.collection.immutable.Map
 

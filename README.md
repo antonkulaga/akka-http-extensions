@@ -8,5 +8,5 @@ Useful directives and utils for akka-http 2.x projects.
 To add akka-http extensions to your dependencies:
 ```scala
 resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases") //add resolver
-libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.9"
+libraryDependencies += "org.denigma" %%% "akka-http-extensions" % "0.0.10"
 ```
