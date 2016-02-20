@@ -2,11 +2,11 @@ object Versions extends WebJarsVersions with ScalaJSVersions with SharedVersions
 {
 	val scala = "2.11.7"
 
-	val akkaHttp = "2.0.3"
+	val akkaHttp = "2.4.2"
 
 	val bcrypt = "2.5"
 
-	val ammonite = "0.5.2"
+	val ammonite = "0.5.4"
 
 	val apacheCodec = "1.10"
 

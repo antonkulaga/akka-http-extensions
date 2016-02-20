@@ -14,13 +14,13 @@ object Dependencies {
 	//akka-related libs
 	lazy val akka = Def.setting(Seq(
 
-		"com.typesafe.akka" %% "akka-stream-experimental" % Versions.akkaHttp,
+		"com.typesafe.akka" %% "akka-stream" % Versions.akkaHttp,
 
-		"com.typesafe.akka" %% "akka-http-core-experimental" % Versions.akkaHttp,
+		"com.typesafe.akka" %% "akka-http-core" % Versions.akkaHttp,
 
 		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp,
 
-		"com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaHttp % "test"
+		"com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp % "test"
 
 	))
 
