@@ -5,9 +5,9 @@ object Dependencies {
 
 	//libs for testing
 	lazy val testing = Def.setting(Seq(
-		"org.scalatest" %%% "scalatest" % Versions.scalaTest % "test",
+		"org.scalatest" %%% "scalatest" % Versions.scalaTest % Test,
 
-		"org.scalatest" %%% "scalatest-matchers" % Versions.scalaTest % "test"
+		"org.scalatest" %%% "scalatest-matchers" % Versions.scalaTestMatchers % Test
 	))
 
 
@@ -20,7 +20,7 @@ object Dependencies {
 
 		"com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaHttp,
 
-		"com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp % "test"
+		"com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp % Test
 
 	))
 

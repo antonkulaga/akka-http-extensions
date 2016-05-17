@@ -1,6 +1,6 @@
 addSbtPlugin("com.lihaoyi" % "scalatex-sbt-plugin" % "0.3.5")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.3.0") // advanced assets handling
+addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.0") // advanced assets handling
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0") //live refresh
 
@@ -20,6 +20,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.8")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.9")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.10")
