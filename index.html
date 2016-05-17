@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><link href="META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" /><link href="styles.css" rel="stylesheet" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><style>
+<!DOCTYPE html><html><head><link href="META-INF/resources/webjars/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" /><link href="styles.css" rel="stylesheet" /><link rel="shortcut icon" type="image/png" href="favicon.png" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><style>
 .scalatex-site-Styles-headerLink{
   color: #777;
   opacity: 0.05;
@@ -57,11 +57,11 @@
 span.hljs-tag, span.hljs-symbol{
     background: none;
 }
-    </style><script src="scripts.js"></script></head><body><div>
+    </style><title>akka-http-extensions</title><script src="scripts.js"></script></head><body><div>
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="akka-http-extensions" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">akka-http-extensions<a class=" scalatex-site-Styles-headerLink" href="#akka-http-extensions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div><div class=" scalatex-site-Styles-content">
   <a href="https://github.com/denigma/akka-http-extensions" style="position: absolute;top: 0px;right: 0px;border: 0;"><img src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" /></a>
   <p>
-    This project contains useful directives and utils for akka-http projects.
+    This project contains useful directives and utils for akka-http 2.x projects.
     In particular:
     <ul>
       <li>
@@ -79,7 +79,7 @@ span.hljs-tag, span.hljs-symbol{
     <p>
         Just add the library to your sbt dependencies:</p>
     <pre><code class="scala scalatex-site-Styles-highlightMe">resolvers += sbt.Resolver.bintrayRepo(&quot;denigma&quot;, &quot;denigma-releases&quot;),
-libraryDependencies += &quot;org.denigma&quot; %%% &quot;akka-http-extensions&quot; % &quot;0.0.5&quot;</code></pre>
+libraryDependencies += &quot;org.denigma&quot; %%% &quot;akka-http-extensions&quot; % &quot;0.0.12&quot;</code></pre>
     <p>
         Then you can simply extend AuthDirectives in your routes.
 </p>
@@ -195,15 +195,6 @@ with WithRegistrationRejections
       <p>
         BiMap - bidirectional map, it is missing in scala collections =(
 </p>
-    <h1 id="UIcontrols" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#UIcontrols" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>UI controls</h1>
-      <p>
-        the github repository contains several projects. Two of them ( akka-http-extensions and binding-controls ) are published.
-        Binding-controls subproject is completely independent from akka-http-extension but provides some predefined views for things like login.
-        Add this lines to add it to your dependencies</p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">resolvers += sbt.Resolver.bintrayRepo(&quot;denigma&quot;, &quot;denigma-releases&quot;),
-libraryDependencies += &quot;org.denigma&quot; %% &quot;binding-controls&quot; % &quot;0.0.4&quot; //for JVM projects
-libraryDependencies += &quot;org.denigma&quot; %%% &quot;binding-controls&quot; % &quot;0.0.4&quot; //for ScalaJS projects
-</code></pre>
   <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Runningexamples" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Running examples<a class=" scalatex-site-Styles-headerLink" href="#Runningexamples" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /></div>
     <p>
       This git repository contains some useful classes and directives for akka-http.
@@ -228,11 +219,11 @@ libraryDependencies += &quot;org.denigma&quot; %%% &quot;binding-controls&quot; 
       To run project:
       <pre><code class="bash scalatex-site-Styles-highlightMe">sbt //to opens sbt console
 re-start //Use this command **instead of** run to run the app
-Open localhost:1234 to see the result, it should reload whenever any sources are change
+Open localhost:2222 to see the result, it should reload whenever any sources are change
 </code></pre></p></div>
 </div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"akka-http-extensions","children":[{"value":"Getting started","children":[]},{"value":"Features","children":[{"value":"Login/registration custom directives","children":[]},{"value":"Pjax support","children":[]},{"value":"Authenticate directive","children":[]},{"value":"Permissions","children":[]},{"value":"Utils and stubs","children":[]},{"value":"UI controls","children":[]}]},{"value":"Running examples","children":[]}]}]
+      [{"value":"akka-http-extensions","children":[{"value":"Getting started","children":[]},{"value":"Features","children":[{"value":"Login/registration custom directives","children":[]},{"value":"Pjax support","children":[]},{"value":"Authenticate directive","children":[]},{"value":"Permissions","children":[]},{"value":"Utils and stubs","children":[]}]},{"value":"Running examples","children":[]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
@@ -242,4 +233,4 @@ Open localhost:1234 to see the result, it should reload whenever any sources are
         );
       })
     })
-  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+  </script></body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
