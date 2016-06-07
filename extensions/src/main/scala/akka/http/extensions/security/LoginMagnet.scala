@@ -10,6 +10,7 @@ case class LoginMagnet(directive: Directive1[LoginInfo])
 object LoginMagnet extends FutureLoginMagnet with TryLoginMagnet
 
 sealed trait FutureLoginMagnet {
+
   type FutureLogin = (String,String)=>Future[LoginResult]
 
   protected def futureLoginDirective(params:(String,String, FutureLogin)): Directive1[LoginInfo] =
@@ -18,10 +19,10 @@ sealed trait FutureLoginMagnet {
       val (username,password,futureLogin) = params
       futureLogin(username,password).fast
         .flatMap{
-        case e:UserDoesNotExist =>  ctx.reject(e)
-        case p:PasswordDoesNotMuch =>  ctx.reject(p)
-        case e:EmailDoesNotExist =>  ctx.reject(e)
-        case l:LoggedIn =>inner(Tuple1(l.user))(ctx)
+        case e: UserDoesNotExist =>  ctx.reject(e)
+        case p: PasswordDoesNotMuch =>  ctx.reject(p)
+        case e: EmailDoesNotExist =>  ctx.reject(e)
+        case l: LoggedIn =>inner(Tuple1(l.user))(ctx)
       }
         .recoverWith{
         case th=>  ctx.reject(ReadErrorRejection(s"cannot login  $username",th))
@@ -58,10 +59,10 @@ sealed trait TryLoginMagnet {
     Directive[Tuple1[LoginInfo]]{ inner ⇒ ctx ⇒
       val (username,password,login) = params
       login(username,password) match {
-        case Success(e:UserDoesNotExist) =>  ctx.reject(e)
-        case Success(p:PasswordDoesNotMuch) =>  ctx.reject(p)
-        case Success(e:EmailDoesNotExist) =>  ctx.reject(e)
-        case Success(l:LoggedIn) =>inner(Tuple1(l.user))(ctx)
+        case Success(e: UserDoesNotExist) =>  ctx.reject(e)
+        case Success(p: PasswordDoesNotMuch) =>  ctx.reject(p)
+        case Success(e: EmailDoesNotExist) =>  ctx.reject(e)
+        case Success(l: LoggedIn) =>inner(Tuple1(l.user))(ctx)
         case Failure(th) =>ctx.reject(ReadErrorRejection(s"cannot login $username",th))
       }
     }

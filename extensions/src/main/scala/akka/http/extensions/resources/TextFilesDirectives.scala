@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.directives.FileAndResourceDirectives.ResourceFi
 
 trait TextFilesDirectives {
 
-  def resource(resourceName:String,
+  def resource(resourceName: String,
                classLoader: ClassLoader = classOf[ActorSystem].getClassLoader)
               (implicit resolver: ContentTypeResolver) =  Directive[Tuple1[ResourceFile]]{ inner=>ctx=>
     if (!resourceName.endsWith("/"))
