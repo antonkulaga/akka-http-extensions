@@ -22,7 +22,7 @@ object TestData{
  * @param elem html element
  * @param params view params (if any)
  */
-class MenuView(val elem: Element, val params: Map[String,Any] = Map.empty) extends ItemsSeqView
+class MenuView(val elem: Element, val params: Map[String,Any] = Map.empty) extends CollectionSeqView
 {
 
   override type Item = String

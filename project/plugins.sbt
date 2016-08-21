@@ -6,7 +6,7 @@ addSbtPlugin("io.spray" % "sbt-revolver" % "0.8.0") //live refresh
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.1") // packaging for production
 
-addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.3.0")
+addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.3.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.2.0") // templates
 
@@ -18,8 +18,8 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.11")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.9")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.2.0")
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.10")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M13")
