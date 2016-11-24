@@ -16,7 +16,9 @@ lazy val publishSettings = Seq(
 
   licenses += ("MPL-2.0", url("http://opensource.org/licenses/MPL-2.0")),
 
-  bintrayPublishIvyStyle := true
+  bintrayPublishIvyStyle := true,
+
+  scmInfo := Some(ScmInfo(url("https://github.com/antonkulaga/akka-http-extensions"), "git@github.com:antonkulaga/akka-http-extensions.git"))
 )
 
 /**
