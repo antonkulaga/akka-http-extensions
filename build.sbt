@@ -1,11 +1,9 @@
-import com.typesafe.sbt.gzip.Import._
-import com.typesafe.sbt.web._
-import com.typesafe.sbt.web.pipeline.Pipeline
-import play.twirl.sbt._
-import playscalajs.{PlayScalaJS, ScalaJSPlay}
+import com.typesafe.sbt.SbtNativePackager.autoImport._
+import com.typesafe.sbt.web.SbtWeb
+import com.typesafe.sbt.web.SbtWeb.autoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-import spray.revolver.RevolverPlugin.autoImport._
 
 lazy val bintrayPublishIvyStyle = settingKey[Boolean]("=== !publishMavenStyle") //workaround for sbt-bintray bug
 
@@ -48,13 +46,6 @@ lazy val extensions = project.in(file("extensions"))
     libraryDependencies ++= Dependencies.akka.value ++ Dependencies.otherJVM.value
   ).enablePlugins(BintrayPlugin).disablePlugins(RevolverPlugin)
 
-val scalaJSDevStage  = Def.taskKey[Pipeline.Stage]("Apply fastOptJS on all Scala.js projects")
-
-def scalaJSDevTaskStage: Def.Initialize[Task[Pipeline.Stage]] = Def.task { mappings: Seq[PathMapping] =>
-  mappings ++ PlayScalaJS.devFiles(Compile).value ++ PlayScalaJS.sourcemapScalaFiles(fastOptJS).value
-}
-
-
 // Scala-Js preview frontend
 lazy val frontend = project.in(file("preview/frontend"))
   .settings(commonSettings: _*)
@@ -63,18 +54,17 @@ lazy val frontend = project.in(file("preview/frontend"))
     persistLauncher in Test := false,
     jsDependencies += RuntimeDOM % "test",
     libraryDependencies ++= Dependencies.shared.value ++ Dependencies.sjsLibs.value
-  ).enablePlugins(ScalaJSPlay).disablePlugins(RevolverPlugin)
+  ).enablePlugins(ScalaJSPlugin, ScalaJSWeb).disablePlugins(RevolverPlugin)
 
 //backend project for preview uhand testing
 lazy val backend = Project("backend", file("preview/backend"),settings = commonSettings)
   .settings(
     mainClass in Compile := Some("org.denigma.preview.Main"),
-    scalaJSDevStage := scalaJSDevTaskStage.value,
     (emitSourceMaps in fullOptJS) := true,
     libraryDependencies ++= Dependencies.shared.value  ++ Dependencies.webjars.value,
-    pipelineStages in Assets := Seq(scalaJSDevStage, gzip), //for run configuration
-    scalaJSProjects := Seq(frontend)
-  ).enablePlugins(SbtTwirl, SbtWeb, PlayScalaJS).dependsOn(extensions).disablePlugins(RevolverPlugin).aggregate(extensions)
+    scalaJSProjects := Seq(frontend),
+    pipelineStages in Assets := Seq(scalaJSPipeline)
+  ).enablePlugins(SbtTwirl, SbtWeb).dependsOn(extensions).disablePlugins(RevolverPlugin).aggregate(extensions)
 
 /** Scalatex banana-rdf website, see http://lihaoyi.github.io/Scalatex/#QuickStart */
 lazy val readme = scalatex.ScalatexReadme(
