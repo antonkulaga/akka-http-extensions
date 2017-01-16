@@ -2,7 +2,7 @@ object Versions extends WebJarsVersions with ScalaJSVersions with SharedVersions
 {
 	val scala = "2.11.8"
 
-	val akkaHttp = "10.0.0"
+	val akkaHttp = "10.0.1"
 
 	val bcrypt = "3.0"
 
@@ -47,9 +47,9 @@ trait WebJarsVersions{
 
 	val jquery = "3.1.1"
 
-	val semanticUI = "2.2.2"
+	val semanticUI = "2.2.7"
 
-	val codemirror = "5.13.2"
+	val codemirror = "5.22.0"
 
 }
 
