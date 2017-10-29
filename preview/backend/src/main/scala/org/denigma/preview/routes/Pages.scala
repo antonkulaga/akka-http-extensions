@@ -8,7 +8,7 @@ import play.twirl.api.Html
 
 class Pages extends Directives with PJax{
 
-  def defaultPage:Option[Html] = {
+  def defaultPage: Option[Html] = {
     Some(html.readme())
   }
 
@@ -19,7 +19,7 @@ class Pages extends Directives with PJax{
     }
   }
 
-  val loadPage:Html=>Html = h=>html.index(Some(h))
+  val loadPage: Html=>Html = h=>html.index(Some(h))
 
 
   def test = pathPrefix("test"~Slash) { ctx=>

@@ -5,10 +5,10 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Rejection, RejectionHandler}
 
 
-case class LoggedIn(user:LoginInfo) extends LoginResult
-case class UserDoesNotExist(username:String) extends LoginResult with Rejection
-case class EmailDoesNotExist(email:String) extends LoginResult with Rejection
-case class PasswordDoesNotMuch(username:String,password:String) extends LoginResult with Rejection
+case class LoggedIn(user: LoginInfo) extends LoginResult
+case class UserDoesNotExist(username: String) extends LoginResult with Rejection
+case class EmailDoesNotExist(email: String) extends LoginResult with Rejection
+case class PasswordDoesNotMuch(username: String, password: String) extends LoginResult with Rejection
 sealed trait LoginResult
 
 trait WithLoginRejections{

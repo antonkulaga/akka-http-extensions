@@ -10,10 +10,10 @@ import com.typesafe.config.Config
 object Main extends App
 {
   implicit val system = ActorSystem()
-  sys.addShutdownHook(system.shutdown())
+  sys.addShutdownHook(system.terminate())
 
   val config: Config = system.settings.config
-  var main:ActorRef = system.actorOf(Props[MainActor])
+  var main: ActorRef = system.actorOf(Props[MainActor])
   main ! AppMessages.Start(config)
 
 }

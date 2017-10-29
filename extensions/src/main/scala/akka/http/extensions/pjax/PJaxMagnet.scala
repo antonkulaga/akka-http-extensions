@@ -9,5 +9,5 @@ trait TemplateEngine{
 }
 
 trait PJax {
-  def pjax[Template<:TemplateEngine](magnet: PJaxMagnet[Template]):Directive[Tuple1[Template#Html]] = magnet.directive
+  def pjax[Template<:TemplateEngine](magnet: PJaxMagnet[Template]): Directive[Tuple1[Template#Html]] = magnet.directive
 }

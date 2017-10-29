@@ -36,7 +36,7 @@ object Dependencies {
 
 		"org.denigma" %%% "codemirror-facade" % Versions.codemirrorFacade,
 
-		"org.denigma" %%% "semantic-ui-facade" % Versions.semanticUIFacade
+		//"org.denigma" %%% "semantic-ui-facade" % Versions.semanticUIFacade
 	))
 
 	//dependencies on javascript libs

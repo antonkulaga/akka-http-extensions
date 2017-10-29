@@ -19,24 +19,13 @@ lazy val publishSettings = Seq(
   scmInfo := Some(ScmInfo(url("https://github.com/antonkulaga/akka-http-extensions"), "git@github.com:antonkulaga/akka-http-extensions.git"))
 )
 
-/**
- * For parts of the project that we will not publish
- */
-lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
-  publishArtifact := false
-)
-
-
 //settings for all the projects
 lazy val commonSettings = Seq(
   scalaVersion := Versions.scala,
   organization := "org.denigma",
   resolvers += sbt.Resolver.bintrayRepo("denigma", "denigma-releases"), //for scala-js-binding
   libraryDependencies ++= Dependencies.commonShared.value ++ Dependencies.testing.value,
-  crossScalaVersions := Seq("2.11.11", "2.12.2"),
-  coursierMaxIterations := 200,
+  crossScalaVersions := Seq("2.11.11", "2.12.4"),
   updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
@@ -54,12 +43,12 @@ lazy val frontend = project.in(file("preview/frontend"))
   .settings(
     persistLauncher in Compile := true,
     persistLauncher in Test := false,
-    jsDependencies += RuntimeDOM % "test",
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
     libraryDependencies ++= Dependencies.shared.value ++ Dependencies.sjsLibs.value
   ).enablePlugins(ScalaJSPlugin, ScalaJSWeb).disablePlugins(RevolverPlugin)
 
 //backend project for preview uhand testing
-lazy val backend = Project("backend", file("preview/backend"),settings = commonSettings)
+lazy val backend = (project in file("preview/backend")).settings(commonSettings)
   .settings(
     mainClass in Compile := Some("org.denigma.preview.Main"),
     (emitSourceMaps in fullOptJS) := true,
@@ -77,7 +66,8 @@ lazy val readme = scalatex.ScalatexReadme(
 ).disablePlugins(RevolverPlugin)
 
 
-lazy val root = Project("root",file("."),settings = commonSettings).settings(
+lazy val root = (project in file(".")).settings(commonSettings)
+.settings(
   mainClass in Compile := (mainClass in backend in Compile).value,
   (fullClasspath in Runtime) += (packageBin in backend in Assets).value
 ).dependsOn(backend).aggregate(backend, frontend)

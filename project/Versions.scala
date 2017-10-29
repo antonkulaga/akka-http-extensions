@@ -1,18 +1,18 @@
 object Versions extends WebJarsVersions with ScalaJSVersions with SharedVersions
 {
-	val scala = "2.11.11"
+	val scala = "2.12.3"
 
-	val akkaHttp = "10.0.9"
+	val akkaHttp = "10.0.10"
 
 	val bcrypt = "3.1"
 
-	val ammonite = "0.7.4"
+	val ammonite = "1.0.0"
 
 	val apacheCodec = "1.10"
 
-	val akkaHttpExtensions = "0.0.15"
+	val akkaHttpExtensions = "0.0.16"
 
-	val controls = "0.0.25"
+	val controls = "0.0.27"
 }
 
 trait ScalaJSVersions {
@@ -30,13 +30,13 @@ trait ScalaJSVersions {
 //versions for libs that are shared between client and server
 trait SharedVersions
 {
-	val scalaRx = "0.3.0"
+	val scalaRx = "0.3.2"
 
-	val scalaTags = "0.5.4"
+	val scalaTags = "0.6.2"
 
 	val scalaCSS = "0.5.3"
 
-	val scalaTest =  "3.0.3"
+	val scalaTest =  "3.0.4"
 
 	val macroParadise = "2.1.0"
 
